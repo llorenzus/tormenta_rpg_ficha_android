@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Fichas Tormenta RPG",
+    "slug": "ficha-tormenta-rpg",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.tormenta.ficha"
+    },
+    "ios": {
+      "supportsTablet": true
+    }
+  }
+}
+
