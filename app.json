@@ -4,10 +4,20 @@
     "slug": "ficha-tormenta-rpg",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8B1E1E"
+    },
     "android": {
-      "package": "com.tormenta.ficha"
+      "package": "com.tormenta.ficha",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#8B1E1E"
+      }
     },
     "ios": {
       "supportsTablet": true
