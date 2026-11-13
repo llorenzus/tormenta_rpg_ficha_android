@@ -1120,3 +1120,4 @@ lista_talentos_final.sort(key=lambda t: t['nome'])
 with open('src/data/talentos/talentos.json', 'w', encoding='utf-8') as f:
     json.dump(lista_talentos_final, f, ensure_ascii=False, indent=2)
 print(f"Arquivo talentos.json atualizado com {len(lista_talentos_final)} talentos.")
+
