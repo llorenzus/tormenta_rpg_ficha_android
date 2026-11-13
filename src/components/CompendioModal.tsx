@@ -21,7 +21,9 @@ import {
   formatarDescricaoMagia,
   formatarDescricaoTalento,
   MagiaData,
+  magias,
   TalentoData,
+  talentos,
 } from '../data';
 import { FichaPersonagem } from '../models/ficha';
 import { COLORS } from '../theme/colors';
@@ -190,7 +192,7 @@ export const CompendioModal: React.FC<Props> = ({
                 abaAtiva === 'talentos' && styles.tabBtnTextAtivo,
               ]}
             >
-              Talentos (371)
+              Talentos ({talentos.length})
             </Text>
           </TouchableOpacity>
 
@@ -207,7 +209,7 @@ export const CompendioModal: React.FC<Props> = ({
                 abaAtiva === 'magias' && styles.tabBtnTextAtivo,
               ]}
             >
-              Magias (816)
+              Magias ({magias.length})
             </Text>
           </TouchableOpacity>
         </View>

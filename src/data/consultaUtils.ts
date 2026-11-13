@@ -232,5 +232,6 @@ export const CATEGORIAS_TALENTO: Array<CategoriaTalento | 'Todas'> = [
   'Magia',
   'Perícia',
   'Poderes Concedidos',
+  'Regional',
   'Tormenta',
 ];

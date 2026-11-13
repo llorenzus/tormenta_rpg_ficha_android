@@ -6,7 +6,8 @@ export type CategoriaTalento =
   | 'Magia'
   | 'Destino'
   | 'Poderes Concedidos'
-  | 'Tormenta';
+  | 'Tormenta'
+  | 'Regional';
 
 export interface TalentoData {
   id: string;
@@ -26,6 +27,7 @@ export const TALENTOS_POR_CATEGORIA: Record<CategoriaTalento, TalentoData[]> = {
   Destino: talentos.filter((t) => t.categoria === 'Destino'),
   'Poderes Concedidos': talentos.filter((t) => t.categoria === 'Poderes Concedidos'),
   Tormenta: talentos.filter((t) => t.categoria === 'Tormenta'),
+  Regional: talentos.filter((t) => t.categoria === 'Regional'),
 };
 
 export const getTalentosPorCategoria = (categoria: CategoriaTalento): TalentoData[] => {
