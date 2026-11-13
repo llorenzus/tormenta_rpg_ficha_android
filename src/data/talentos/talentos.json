@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "acelerar_magia",
         "beneficio":  "Lança uma magia como uma ação livre (1x/rodada) gastando +4 PM sem ficar desprevenido. Não afeta magias com tempo maior que ação completa.",
@@ -88,6 +88,14 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "alcance_supremo",
+        "nome":  "Alcance Supremo",
+        "categoria":  "Combate",
+        "preRequisitos":  "Especialização em Arma.",
+        "beneficio":  "Enquanto estiver usando uma arma na qual tenha Especialização em Arma, aumenta seu alcance natural em 1,5m.",
+        "descricao":  "Você sabe esticar seu corpo e posicionar-se de forma a cobrir uma grande extensão do campo de batalha."
+    },
+    {
         "id":  "alquimista_avarento",
         "descricao":  "Você pode criar itens alquímicos com menos materiais (ou materiais mais baratos).",
         "beneficio":  "Você pode criar itens alquímicos por um sexto do preço de mercado (normal é um terço).",
@@ -112,6 +120,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "amigo_dos_animais",
+        "nome":  "Amigo dos Animais",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna.",
+        "beneficio":  "Você recebe a habilidade de classe empatia selvagem como um druida do seu nível de personagem (ou +4 nos testes se já possuir).",
+        "descricao":  "Os animais entendem que você não oferece perigo."
+    },
+    {
         "id":  "amigo_imaginario",
         "descricao":  "Ninguém mais vê seu familiar... Mas você jura que ele está ao seu lado!",
         "beneficio":  "Você possui um familiar que existe apenas na sua imaginação, mantendo todos os bônus mecânicos sem poder ser atacado, capturado ou notado.",
@@ -134,6 +150,14 @@
         "nome":  "Anatomia Insana",
         "preRequisitos":  "Nenhum.",
         "categoria":  "Tormenta"
+    },
+    {
+        "id":  "animal_encurralado",
+        "nome":  "Animal Encurralado",
+        "categoria":  "Combate",
+        "preRequisitos":  "Destreza 13.",
+        "beneficio":  "Quando estiver flanqueado, sua margem de ameaça aumenta em 1 por oponente que estiver flanqueando-o (válido apenas contra os oponentes que o flanqueiam).",
+        "descricao":  "Você é mais perigoso quando está cercado de inimigos."
     },
     {
         "id":  "ao_sabor_do_destino",
@@ -224,6 +248,14 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "artilharia_pesada",
+        "nome":  "Artilharia Pesada",
+        "categoria":  "Combate",
+        "preRequisitos":  "Especialização em Arma (arco longo ou besta pesada); golpes Estocada Penetrante e Ferir a Perna; bônus base de ataque +6.",
+        "beneficio":  "Você recebe +2 no dano com arco longo e besta pesada. Pode sofrer –2 no ataque para aumentar o bônus de dano para +4.",
+        "descricao":  "Escola de combate focada no potencial destrutivo extremo de arcos longos e bestas pesadas."
+    },
+    {
         "id":  "artista",
         "beneficio":  "Você pode rolar outra vez um teste recém realizado de Atuação.",
         "descricao":  "Você tem um dom natural para a música, poesia, oratória ou teatro.",
@@ -256,12 +288,36 @@
         "categoria":  "Perícia"
     },
     {
+        "id":  "asas_de_aco",
+        "nome":  "Asas de Aço",
+        "categoria":  "Destino",
+        "preRequisitos":  "Asas.",
+        "beneficio":  "Suas asas elevam sua CA em +1 para cada asa ou podem ser usadas para golpear (dano 1d4 + mod. For cada). Contam como armas leves para Combater com Duas Armas. Não pode atacar e proteger com a mesma asa ou usar enquanto voa. Especial: pode escolher Ataque com Escudo Aprimorado para atacar com as asas sem perder a CA.",
+        "descricao":  "Você tem asas anormalmente rígidas, que podem ser empregadas como armas ou escudos."
+    },
+    {
+        "id":  "asas_de_morcego",
+        "nome":  "Asas de Morcego",
+        "categoria":  "Destino",
+        "preRequisitos":  "Herança do Morcego, patágio.",
+        "beneficio":  "Você recebe asas que oferecem deslocamento de voo 15m.",
+        "descricao":  "Você tem asas verdadeiras e pode voar."
+    },
+    {
         "id":  "ataque_atordoante",
         "beneficio":  "Declare que está usando este talento antes de fazer um ataque desarmado. Se você acertar o ataque, além de sofrer o dano normal, a vítima deve fazer um teste de Fortitude (CD 10 + metade do seu nível + modificador de Sabedoria). Se falhar, fica atordoada por uma rodada. Utilizações/dia: 1 + mod. Sab.",
         "descricao":  "Você sabe atingir áreas vulneráveis de seus inimigos.",
         "nome":  "Ataque Atordoante",
         "preRequisitos":  "Sab 13, Ataque Desarmado Aprimorado.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "ataque_com_escudo",
+        "nome":  "Ataque com Escudo",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Escudo.",
+        "beneficio":  "Se estiver usando escudo, pode fazer um ataque adicional com ele. No entanto, sofre penalidade de –2 em todas as jogadas de ataque e perde o bônus de CA do escudo até sua próxima rodada.",
+        "descricao":  "Você é treinado em atacar com uma arma e um escudo."
     },
     {
         "id":  "ataque_com_escudo_aprimorado",
@@ -320,6 +376,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "ataque_poderoso_aprimorado",
+        "nome":  "Ataque Poderoso Aprimorado",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque Poderoso, bônus base de ataque +6.",
+        "beneficio":  "Como Ataque Poderoso, mas você pode sofrer penalidade de –4 no ataque para receber bônus de +8 no dano (não cumulativo com Ataque Poderoso).",
+        "descricao":  "Seus golpes destruidores são destruidores mesmo."
+    },
+    {
         "id":  "ataque_preciso",
         "beneficio":  "Quando usa uma arma afetada pelo talento Acuidade com Arma, você causa 1d6 pontos de dano adicional.",
         "descricao":  "Com lâminas leves, você sabe golpear com precisão mortal.",
@@ -334,6 +398,22 @@
         "nome":  "Ataque Sagaz",
         "preRequisitos":  "Int 13, Acuidade com Arma, bônus base de ataque +4.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "ataques_multiplos",
+        "nome":  "Ataques Múltiplos",
+        "categoria":  "Combate",
+        "preRequisitos":  "Uma ou mais armas naturais.",
+        "beneficio":  "Quando faz um ataque adicional com uma arma natural, a penalidade que você sofre em seus ataques diminui para –2 (normal: sofre –4).",
+        "descricao":  "Você sabe como usar todo o seu corpo em uma luta."
+    },
+    {
+        "id":  "ate_acertar",
+        "nome":  "Até Acertar",
+        "categoria":  "Combate",
+        "preRequisitos":  "Foco em Arma.",
+        "beneficio":  "Se errar um ataque com arma na qual possui Foco em Arma, recebe +1 cumulativo nas próximas jogadas de ataque contra o mesmo oponente (+2 no seguinte se errar, etc.) até acertar.",
+        "descricao":  "Você não desiste frente a pequenas falhas. Tenta de novo e de novo, até ser bem-sucedido!"
     },
     {
         "id":  "atletico",
@@ -384,12 +464,36 @@
         "categoria":  "Perícia"
     },
     {
+        "id":  "basta",
+        "nome":  "Basta!",
+        "categoria":  "Combate",
+        "preRequisitos":  "Vontade de Ferro, bônus base de ataque +10.",
+        "beneficio":  "Uma vez por dia, um golpe seu pode ignorar qualquer camuflagem, imunidade e redução de dano do alvo. Se errar o ataque, o uso não é perdido.",
+        "descricao":  "Você está farto dos truques e artimanhas de seus oponentes. Vai acabar com esta luta em um único golpe!"
+    },
+    {
         "id":  "bloqueio_ambidestro",
         "beneficio":  "Quando estiver usando duas armas ou uma arma dupla, você recebe +1 na classe de armadura.",
         "descricao":  "Você é habilidoso em se defender usando duas armas ou uma arma dupla.",
         "nome":  "Bloqueio Ambidestro",
         "preRequisitos":  "Des 15, Combater com Duas Armas.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "bote_da_vibora",
+        "nome":  "Bote da Víbora",
+        "categoria":  "Combate",
+        "preRequisitos":  "Combater com Duas Armas.",
+        "beneficio":  "Se estiver lutando com duas armas, pode fazer um ataque com cada uma no final de uma investida (com penalidade de duas armas e bônus de investida).",
+        "descricao":  "Você corre em direção ao inimigo e golpeia com duas armas num único ataque."
+    },
+    {
+        "id":  "brecha_na_guarda",
+        "nome":  "Brecha na Guarda",
+        "categoria":  "Combate",
+        "preRequisitos":  "Tendência não Leal.",
+        "beneficio":  "Você recebe um bônus de +4 nas jogadas de dano contra oponentes atordoados, caídos ou desprevenidos.",
+        "descricao":  "Você sabe se aproveitar das falhas na defesa de seu oponente. Não é covardia — é sobrevivência."
     },
     {
         "id":  "cancao_aterrorizante",
@@ -472,6 +576,14 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "codigo_militar",
+        "nome":  "Código Militar",
+        "categoria":  "Perícia",
+        "preRequisitos":  "Nenhum.",
+        "beneficio":  "Personagens com este talento podem se comunicar verbalmente na frente de outras pessoas sem serem entendidos. Em combate, podem formular táticas e estratégias sem que o inimigo compreenda. Mensagens também podem ser escritas no código. Nenhuma perícia é capaz de decifrá-lo (quebrado apenas por magias como compreender idiomas).",
+        "descricao":  "Você adota um jargão com seus soldados ou companheiros, um verdadeiro idioma incompreensível para todos os inimigos."
+    },
+    {
         "id":  "comandar",
         "beneficio":  "Gasta ação padrão para gritar ordens: aliados ganham +1 em jogadas e testes por rodadas iguais a 1 + mod. Carisma.",
         "descricao":  "Você sabe erguer o moral de seu grupo e liderar tropas sob fogo cruzado.",
@@ -512,6 +624,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "companheiro_draconico",
+        "nome":  "Companheiro Dracônico",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "5º nível de personagem, devoto de Kallyadranoch, Megalokk ou Wynna, companheiro animal ou familiar.",
+        "beneficio":  "O companheiro animal ou familiar escolhido adquire o modelo meio-dragão.",
+        "descricao":  "Você foi premiado com um servo dracônico."
+    },
+    {
         "id":  "companheiro_enxame",
         "descricao":  "Você não tem um companheiro animal. Tem centenas.",
         "beneficio":  "Substitui companheiro animal por um enxame de criaturas (ratos, vespas, aranhas, etc.) com atributos de enxame e habilidades selecionáveis.",
@@ -534,6 +654,22 @@
         "nome":  "Conhecimento Anatômico",
         "preRequisitos":  "Treinado em Cura, ataque furtivo +2d6.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "conhecimento_de_golpes",
+        "nome":  "Conhecimento de Golpes",
+        "categoria":  "Combate",
+        "preRequisitos":  "Bônus base de ataque +1.",
+        "beneficio":  "Você recebe dois golpes marciais e 3 pontos de energia. Pode gastar uma ação completa para tomar fôlego e recuperar 3 pontos de energia. Especial: pode ser escolhido diversas vezes (+2 golpes e +3 energia a cada vez).",
+        "descricao":  "Você aprendeu golpes especiais, mais complexos e eficazes que meros cortes e estocadas."
+    },
+    {
+        "id":  "conhecimento_de_posturas",
+        "nome":  "Conhecimento de Posturas",
+        "categoria":  "Combate",
+        "preRequisitos":  "Bônus base de ataque +1.",
+        "beneficio":  "Você recebe duas posturas de combate. Pode declarar uma postura ativa e trocá-la 1 vez por rodada como ação livre. Especial: pode ser escolhido diversas vezes (+2 posturas a cada vez).",
+        "descricao":  "Você treinou diversas posições de luta e pode trocar entre elas conforme a situação exige."
     },
     {
         "id":  "conhecimento_magico",
@@ -576,12 +712,28 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "craque_gu_on",
+        "nome":  "Craque Gu-On",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Arma Exótica (bola gu-on), Foco em Arma (bola gu-on).",
+        "beneficio":  "Ao errar um ataque, não precisa de ação de movimento para recuperar a bola. Ao rolar 1 natural, pode recuperá-la com ação de movimento em vez de errar totalmente.",
+        "descricao":  "Você é um fenômeno com a bola gu-on."
+    },
+    {
         "id":  "criar_obra_prima",
         "beneficio":  "Pode construir armas (+1 ataque), armaduras (–1 penalidade) e ferramentas (+2 na perícia) de qualidade obra-prima (CD+5 e +100 TO).",
         "descricao":  "Você é um mestre artesão capaz de confeccionar artefatos de acabamento impecável.",
         "nome":  "Criar Obra-Prima",
         "preRequisitos":  "Treinado em Ofício, Foco em Perícia (Ofício).",
         "categoria":  "Perícia"
+    },
+    {
+        "id":  "danca_do_leopardo",
+        "nome":  "Dança do Leopardo",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque Duplo (arma corpo-a-corpo de corte ou perfuração); golpes Ferir o Braço e Lacerar; postura Pata do Leopardo; bônus base de ataque +8.",
+        "beneficio":  "Acertos corpo-a-corpo com a arma em que possui Ataque Duplo causam +2 pontos de dano na Força do oponente além do dano normal.",
+        "descricao":  "Escola agressiva desenvolvida em Yuden que mina sistematicamente o vigor muscular dos oponentes."
     },
     {
         "id":  "dedos_ageis",
@@ -606,6 +758,14 @@
         "nome":  "Desarmar Aprimorado",
         "preRequisitos":  "Int 13, Especialização em Combate.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "destino",
+        "nome":  "Destino",
+        "categoria":  "Destino",
+        "preRequisitos":  "Nenhum.",
+        "beneficio":  "Você recebe um ponto de ação adicional no início de cada sessão de jogo. Quando gasta um ponto de ação para recuperar pontos de vida, recupera o dobro do normal. Especial: só pode ser escolhido no 1º nível de personagem.",
+        "descricao":  "Os oráculos avisaram que você tem grandes feitos a realizar. Você não planeja morrer antes de cumprir a profecia."
     },
     {
         "id":  "destruir_o_mal_aprimorado",
@@ -654,6 +814,14 @@
         "nome":  "Dízimo Duvidoso",
         "preRequisitos":  "Treinado em Enganação, tendência não Leal.",
         "categoria":  "Perícia"
+    },
+    {
+        "id":  "dom_da_profecia",
+        "nome":  "Dom da Profecia",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna ou Thyatis.",
+        "beneficio":  "Você pode lançar augúrio uma vez por dia sem gastar PM. Além disso, uma vez por dia recebe +2 em uma jogada de ataque ou teste de habilidade, perícia ou resistência (declarado antes do mestre dizer o resultado).",
+        "descricao":  "Você recebe visões de sua divindade."
     },
     {
         "id":  "domador_amador",
@@ -784,6 +952,14 @@
         "categoria":  "Poderes Concedidos"
     },
     {
+        "id":  "dominio_das_ondas",
+        "nome":  "Domínio das Ondas",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Oceano ou Sorinda.",
+        "beneficio":  "Você recebe +2 na CA e em testes de Acrobacia, Atletismo, Furtividade, Percepção e Ofício (marinheiro) quando estiver em uma embarcação.",
+        "descricao":  "Você é mais habilidoso nas tábuas e cordames de uma embarcação."
+    },
+    {
         "id":  "dominio_das_plantas",
         "beneficio":  "Você pode lançar a magia constrição três vezes por dia sem gastar pontos de magia.",
         "descricao":  "A relva e as raízes da terra obedecem às suas súplicas sagradas.",
@@ -872,6 +1048,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "duro_de_ferir",
+        "nome":  "Duro de Ferir",
+        "categoria":  "Combate",
+        "preRequisitos":  "Constituição 13.",
+        "beneficio":  "Você ignora o primeiro dano que sofrer a cada combate.",
+        "descricao":  "Quando está descansado e novo em folha, nada parece abalá-lo."
+    },
+    {
         "id":  "duro_de_matar",
         "beneficio":  "Quando você sofre dano que poderia levá-lo a 0 ou menos pontos de vida, você pode ignorar completamente esse dano. Você pode usar este talento uma vez por dia.",
         "descricao":  "Você resiste a ferimentos mortais que fariam outros cair.",
@@ -904,6 +1088,46 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "entrada_triunfal",
+        "nome":  "Entrada Triunfal",
+        "categoria":  "Combate",
+        "preRequisitos":  "Destreza 13, Iniciativa Aprimorada.",
+        "beneficio":  "Sempre que você vencer a iniciativa, recebe uma quantidade de PV temporários igual à metade de seus PV normais.",
+        "descricao":  "Quando você consegue agir primeiro, é capaz de ditar os termos do combate."
+    },
+    {
+        "id":  "erosao",
+        "nome":  "Erosão",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque Poderoso.",
+        "beneficio":  "Sempre que acertar ataque corpo-a-corpo em inimigo com redução de dano, ele perde 1 ponto de RD (ou 2 pontos em caso de acerto crítico). A RD volta ao normal após o combate.",
+        "descricao":  "Não importa a resistência do inimigo. Você é persistente e continua golpeando até acabar com suas defesas."
+    },
+    {
+        "id":  "escamas_do_dragao",
+        "nome":  "Escamas do Dragão",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna, Kallyadranoch ou Megalokk.",
+        "beneficio":  "Você recebe CA +2.",
+        "descricao":  "Sua pele torna-se couro escamoso."
+    },
+    {
+        "id":  "escola_das_armas_de_haste",
+        "nome":  "Escola das Armas de Haste",
+        "categoria":  "Combate",
+        "preRequisitos":  "Alcance Supremo, Foco em Arma Aprimorado (qualquer arma de haste); golpe Aparar Ataque Corpo-a-Corpo; postura Base do Soldado.",
+        "beneficio":  "Você recebe +2 nas jogadas de ataque com armas de haste e pode usá-las para atacar oponentes adjacentes normalmente.",
+        "descricao":  "Escola de infantaria de elite que usa alabardas e piques com alcance defensivo insuperável."
+    },
+    {
+        "id":  "escola_das_duas_maos",
+        "nome":  "Escola das Duas Mãos",
+        "categoria":  "Combate",
+        "preRequisitos":  "Empunhadura Poderosa, Golpe com Duas Mãos; golpes Ataque Pesado e Pancada com Pomo; postura Abraço da Montanha; bônus base de ataque +6.",
+        "beneficio":  "Pode gastar ação de movimento em vez de energia para o golpe Ataque Pesado. Com arma de duas mãos, pode gastar ação de movimento e 1 energia para rolar novamente um ataque recém realizado.",
+        "descricao":  "Estilo bárbaro e anão refinado para desferir golpes avassaladores com armas pesadas."
+    },
+    {
         "id":  "escrever_pergaminhos",
         "descricao":  "Você pode criar pergaminhos mágicos de uso único.",
         "beneficio":  "Permite escrever pergaminhos com magias conhecidas pagando nível mín x 25 TO mais custos de material/XP.",
@@ -918,6 +1142,54 @@
         "nome":  "Escudo da Fé Aprimorado",
         "preRequisitos":  "Treinamento com escudo, capacidade de lançar escudo da fé.",
         "categoria":  "Magia"
+    },
+    {
+        "id":  "escudo_de_tauron",
+        "nome":  "Escudo de Tauron",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque com Escudo Aprimorado; golpes Bloqueio com Escudo, Corte com Escudo, Pancada com Escudo e Sobrepujar; bônus base de ataque +4.",
+        "beneficio":  "Recebe +1 no ataque e dano com escudos. Ao desferir Corte com Escudo ou Pancada com Escudo, realiza ataque adicional com a mão principal (penalidade –4).",
+        "descricao":  "Técnica legionária de Tapista que transforma grandes escudos em ferramentas ofensivas simultâneas."
+    },
+    {
+        "id":  "escudo_destemido",
+        "nome":  "Escudo Destemido",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Escudo.",
+        "beneficio":  "Se estiver usando um escudo, não sofre a penalidade de –2 em CA ao realizar uma investida.",
+        "descricao":  "Você avança sem medo contra o inimigo, confiando que seu escudo irá protegê-lo."
+    },
+    {
+        "id":  "escudo_fraterno",
+        "nome":  "Escudo Fraterno",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Escudo.",
+        "beneficio":  "Se você terminar seu turno adjacente a um aliado, pode conceder seu bônus de escudo em CA a ele (sem que você o perca). O aliado perde o bônus se não estiver mais adjacente. Especial: não pode ser usado em falange.",
+        "descricao":  "Você aprendeu a usar seu escudo para proteger seus aliados, além de si mesmo."
+    },
+    {
+        "id":  "escudo_heroico",
+        "nome":  "Escudo Heroico",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque com Escudo Aprimorado.",
+        "beneficio":  "Pode usar o escudo como arma de arremesso (leve: 15m; pesado: 9m). Retorna à mão na mesma rodada se acertar o alvo dentro de um incremento. Mantém o bônus de CA do escudo.",
+        "descricao":  "Você arremessa seu escudo como uma arma mortal."
+    },
+    {
+        "id":  "escudo_inteligente",
+        "nome":  "Escudo Inteligente",
+        "categoria":  "Combate",
+        "preRequisitos":  "Escudo Heroico.",
+        "beneficio":  "Ao acertar com escudo arremessado, ele ricocheteia para atingir inimigos subsequentes a até um incremento (penalidade cumulativa de –2 por ataque extra) até errar e retornar à mão.",
+        "descricao":  "Quando você arremessa seu escudo, ele parece ter vida própria."
+    },
+    {
+        "id":  "escudo_veloz",
+        "nome":  "Escudo Veloz",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Escudo.",
+        "beneficio":  "Se você estiver usando um escudo, não pode ser flanqueado.",
+        "descricao":  "Você sabe se movimentar com rapidez, usando seu escudo para se defender de ataques de todos os lados."
     },
     {
         "id":  "esculpir_magia",
@@ -990,6 +1262,22 @@
         "nome":  "Estender Magia [metamágico]",
         "preRequisitos":  "Nenhum.",
         "categoria":  "Magia"
+    },
+    {
+        "id":  "estocada_cruel",
+        "nome":  "Estocada Cruel",
+        "categoria":  "Combate",
+        "preRequisitos":  "Foco em Arma (qualquer arma corpo-a-corpo de perfuração).",
+        "beneficio":  "Ao acertar com arma de perfuração com Foco em Arma, o oponente sangra (teste de Constituição CD 15 por turno para estabilizar ou sofre 1d4 pontos de dano). Não acumulativo consigo mesmo. Criaturas imunes a críticos são imunes.",
+        "descricao":  "Você é capaz de atravessar seus oponentes com golpes precisos."
+    },
+    {
+        "id":  "estocada_cruel_maior",
+        "nome":  "Estocada Cruel Maior",
+        "categoria":  "Combate",
+        "preRequisitos":  "Estocada Cruel, bônus base de ataque +6.",
+        "beneficio":  "Como Estocada Cruel, mas o efeito se acumula consigo mesmo a cada golpe bem-sucedido.",
+        "descricao":  "Os inimigos viram espetinho frente à sua lâmina!"
     },
     {
         "id":  "estudioso_arcano",
@@ -1072,6 +1360,30 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "exterminador_de_monstros",
+        "nome":  "Exterminador de Monstros",
+        "categoria":  "Combate",
+        "preRequisitos":  "Bônus base de ataque +8.",
+        "beneficio":  "Você recebe +2 nas jogadas de dano contra criaturas Grandes ou maiores. Além disso, inimigos não recebem bônus por tamanho em testes de manobra contra você.",
+        "descricao":  "Você é um especialista em matar criaturas gigantescas."
+    },
+    {
+        "id":  "faca_nas_costas",
+        "nome":  "Faca nas Costas",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Hollen, Hyninn ou Sszzaas.",
+        "beneficio":  "Você recebe a habilidade de classe ataque furtivo (+1d6), ou aumenta o dano dela em +1d6 se já a possuir.",
+        "descricao":  "Um ataque traiçoeiro vale por todos os outros."
+    },
+    {
+        "id":  "falange",
+        "nome":  "Falange",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Escudo.",
+        "beneficio":  "Se você estiver usando um escudo, recebe um bônus de +1 na CA. Além disso, se estiver adjacente a um aliado com este talento, vocês podem gastar uma ação de movimento para formar uma falange, que concede cobertura a todos os seus participantes.",
+        "descricao":  "Você é experiente em lutar em uma formação compacta, juntando seu escudo com os de seus companheiros."
+    },
+    {
         "id":  "falcoeiro",
         "descricao":  "Você é um mestre na arte da falcoaria.",
         "beneficio":  "Você recebe um falcão como familiar, mesmo que não pertença a uma classe conjuradora.",
@@ -1086,6 +1398,30 @@
         "nome":  "Familiar",
         "preRequisitos":  "Capacidade de lançar magias arcanas.",
         "categoria":  "Magia"
+    },
+    {
+        "id":  "faro_aprimorado",
+        "nome":  "Faro Aprimorado",
+        "categoria":  "Destino",
+        "preRequisitos":  "Faro.",
+        "beneficio":  "Você percebe criaturas a até 15m e recebe +6 em testes de Sobrevivência para rastrear usando o faro (normal: 9m e +4).",
+        "descricao":  "Você tem olfato ainda mais aguçado."
+    },
+    {
+        "id":  "faro_discriminatorio",
+        "nome":  "Faro Discriminatório",
+        "categoria":  "Destino",
+        "preRequisitos":  "Faro, Sabedoria 15.",
+        "beneficio":  "Ao perceber criaturas, identifica seu tipo (animal, monstro, humanoide, etc., desde que já farejado). Pode identificar criatura disfarçada adjacente com ação completa e teste de Percepção (CD 15). Recebe +4 em Intuição e +2 em Ofício (avaliação).",
+        "descricao":  "Você identifica muita coisa através do cheiro."
+    },
+    {
+        "id":  "faro_para_magia",
+        "nome":  "Faro para Magia",
+        "categoria":  "Destino",
+        "preRequisitos":  "Faro, Sabedoria 15, Faro Discriminatório.",
+        "beneficio":  "Você pode farejar auras mágicas, como se estivesse sob efeito constante da magia detectar magia.",
+        "descricao":  "Você sente cheiro de magia."
     },
     {
         "id":  "fintar_aprimorado",
@@ -1128,6 +1464,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "foco_em_escudo",
+        "nome":  "Foco em Escudo",
+        "categoria":  "Combate",
+        "preRequisitos":  "Saber usar o tipo de escudo escolhido.",
+        "beneficio":  "Aumenta o bônus de CA do escudo escolhido em +1 e recebe +1 em todos os testes de resistência enquanto o estiver usando.",
+        "descricao":  "Escolha um tipo de escudo entre leve, pesado ou de corpo. Você consegue se proteger muito bem com ele."
+    },
+    {
         "id":  "foco_em_magia",
         "beneficio":  "Aumenta a CD dos testes de resistência contra a magia escolhida em CD+2.",
         "descricao":  "Escolha uma magia favorita. É muito mais difícil para os adversários resistirem ao seu feitiço.",
@@ -1168,6 +1512,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "forca_da_fe",
+        "nome":  "Força da Fé",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Bônus base de ataque +3, capacidade de preparar magias divinas, devoto de Kallyadranoch, Keenn, Megalokk, Ragnar ou Tauron.",
+        "beneficio":  "Como uma ação livre, pode converter uma magia divina preparada em um surto muscular, aumentando sua Força em +2 por nível da magia por uma rodada.",
+        "descricao":  "Você pode canalizar seu poder da fé em violência pura."
+    },
+    {
         "id":  "forma_de_enxame",
         "descricao":  "Você não se transforma em apenas um animal — pode dividir sua consciência em milhares deles.",
         "beneficio":  "Gaste dois usos de forma selvagem para virar um enxame: imune a manobras e dano de alvo único, metade do dano de armas, causa dano automático a quem estiver no seu espaço.",
@@ -1176,12 +1528,28 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "forma_selvagem_adicional",
+        "nome":  "Forma Selvagem Adicional",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna, Megalokk ou Oceano, habilidade de classe forma selvagem.",
+        "beneficio":  "Você pode utilizar a habilidade de classe forma selvagem duas vezes adicionais por dia.",
+        "descricao":  "A fera em você se manifesta mais vezes."
+    },
+    {
         "id":  "forma_selvagem_mistica",
         "descricao":  "Você é capaz de se transformar em um animal híbrido sagrado para seu deus padroeiro.",
         "beneficio":  "Gaste três usos diários de forma selvagem: CA +4 (+6 no 11º nível, +8 no 17º), +1 na CD de todas as magias e 1x ao dia Potencializar Magia gratuito.",
         "nome":  "Forma Selvagem Mística",
         "preRequisitos":  "Sab 15, habilidade de classe forma selvagem.",
         "categoria":  "Destino"
+    },
+    {
+        "id":  "formacao_tartaruga",
+        "nome":  "Formação Tartaruga",
+        "categoria":  "Combate",
+        "preRequisitos":  "Escudo Veloz.",
+        "beneficio":  "Se você estiver usando um escudo, recebe um bônus de +2 nos testes de resistência.",
+        "descricao":  "Usando um escudo em um padrão de movimentos complexos, você se protege por inteiro, como uma tartaruga dentro de seu casco."
     },
     {
         "id":  "fortitude_maior",
@@ -1208,12 +1576,44 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "furia_estendida",
+        "nome":  "Fúria Estendida",
+        "categoria":  "Destino",
+        "preRequisitos":  "Habilidade de classe fúria.",
+        "beneficio":  "A duração de sua fúria aumenta em 3 rodadas. Especial: pode ser escolhido várias vezes (+3 rodadas a cada vez).",
+        "descricao":  "Sua ira queima por mais tempo, com o mesmo ardor."
+    },
+    {
+        "id":  "garras_de_fera",
+        "nome":  "Garras de Fera",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna, Megalokk ou Oceano.",
+        "beneficio":  "Você recebe duas armas naturais de garras (dano de espada curta para seu tamanho). Pode atacar com ambas com penalidade de –4 nos ataques. Ação livre, dura uma hora, 1 vez ao dia.",
+        "descricao":  "Suas mãos podem se transformar em garras mortais."
+    },
+    {
+        "id":  "ginga_das_ondas",
+        "nome":  "Ginga das Ondas",
+        "categoria":  "Perícia",
+        "preRequisitos":  "Nenhum.",
+        "beneficio":  "Você recebe +1 em testes de Reflexos. Em embarcações, nunca precisa de testes de Acrobacia para ficar em pé pelas condições marítimas e não sofre penalidades em testes apenas por estar navegando.",
+        "descricao":  "Você está acostumado a viver em navios e ri daqueles que perdem o equilíbrio no mar."
+    },
+    {
         "id":  "golpe_com_duas_maos",
         "beneficio":  "Quando usando uma arma de corpo-a-corpo com as duas mãos, você soma o dobro de seu modificador de Força às jogadas de dano.",
         "descricao":  "Você consegue canalizar toda a sua força quando usa uma arma com as duas mãos.",
         "nome":  "Golpe com Duas Mãos",
         "preRequisitos":  "For 15, Ataque Poderoso.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "golpe_especial",
+        "nome":  "Golpe Especial",
+        "categoria":  "Combate",
+        "preRequisitos":  "Surto Heroico.",
+        "beneficio":  "Ao usar Surto Heroico para ataque adicional, realiza golpe especial com +2 no ataque e dano e um poder especial de arma mágica equivalente a bônus de +2 (escolhido ao adquirir o talento).",
+        "descricao":  "Você é um herói. E todo herói tem seu golpe característico."
     },
     {
         "id":  "granadeiro",
@@ -1224,6 +1624,22 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "grande_automato",
+        "nome":  "Grande Autômato",
+        "categoria":  "Magia",
+        "preRequisitos":  "Artífice 4º nível.",
+        "beneficio":  "Você pode escolher um companheiro autômato de tamanho Grande (normal: Pequeno ou Médio).",
+        "descricao":  "Vamos lá, grandalhão!"
+    },
+    {
+        "id":  "gritos_de_poder",
+        "nome":  "Gritos de Poder",
+        "categoria":  "Destino",
+        "preRequisitos":  "Habilidade de classe fúria.",
+        "beneficio":  "Você recebe dois gritos de poder de bárbaro. Cada grito consome rodadas da fúria (ação livre, CD 10 + 1/2 nível + mod. Car). Especial: pode ser escolhido diversas vezes (+2 gritos a cada vez).",
+        "descricao":  "Você pode usar sua fúria para canalizar o poder de espíritos ou da sua própria natureza selvagem."
+    },
+    {
         "id":  "grudar_o_cano",
         "descricao":  "Para você, atirar com uma arma de fogo faz parte do combate corpo-a-corpo.",
         "beneficio":  "Se você disparar sua arma de fogo quando estiver adjacente ao oponente (a até 1,5m), recebe um bônus de +2 na jogada de ataque e aumenta a margem de ameaça de crítico em +1.",
@@ -1232,12 +1648,68 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "guarda_de_theudric",
+        "nome":  "Guarda de Theudric",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque com Escudo Aprimorado, Duro de Ferir, Escudo Veloz; golpes Bloqueio com Escudo e Sobrepujar; postura Base do Guarda; bônus base de ataque +4.",
+        "beneficio":  "Com escudo, ganha redução de dano igual ao bônus total de CA concedido pelo escudo (ex: escudo pesado +2 concede RD 4, irredutível por material).",
+        "descricao":  "Estilo defensivo impenetrável concebido para proteger figuras nobres contra qualquer agressão."
+    },
+    {
+        "id":  "herbanario",
+        "nome":  "Herbanário",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna, capacidade de lançar magias divinas de 3º nível, Carisma 13.",
+        "beneficio":  "Você aprende as magias ampliar plantas e falar com plantas. Pode entrar em transe vegetal para fazer plantas crescerem como quiser (mínimo 1 semana, ficando exausto ao sair).",
+        "descricao":  "Você sabe convencer as plantas a crescerem como você quiser."
+    },
+    {
+        "id":  "herdeiro_aprimorado",
+        "nome":  "Herdeiro Aprimorado",
+        "categoria":  "Destino",
+        "preRequisitos":  "Qualquer talento moreau.",
+        "beneficio":  "Você pode escolher mais duas habilidades da lista de seu talento moreau (normal: apenas duas).",
+        "descricao":  "Você tem uma ligação ainda maior com seu ancestral animal."
+    },
+    {
+        "id":  "heroismo_rotineiro",
+        "nome":  "Heroísmo Rotineiro",
+        "categoria":  "Destino",
+        "preRequisitos":  "7º nível de personagem.",
+        "beneficio":  "Você recebe um ponto de ação adicional no início de cada sessão de jogo. Além disso, pode gastar um ponto de ação para ganhar um uso adicional de qualquer habilidade de classe que possua usos diários (como destruir o mal, fúria, música de bardo, etc.).",
+        "descricao":  "Para você, façanhas são apenas parte do trabalho, e proezas extraordinárias são lugar-comum."
+    },
+    {
         "id":  "idolo_artoniano",
         "descricao":  "Não basta apenas habilidade musical. Você usa sua beleza para se tornar um verdadeiro ídolo.",
         "beneficio":  "Você pode aplicar seu bônus pelo talento Atraente (+4) em testes de Atuação. Além disso, aumente a CD de suas músicas de bardo em +2 quando elas afetarem qualquer um que possa se sentir fisicamente atraído por você.",
         "nome":  "Ídolo Artoniano",
         "preRequisitos":  "Habilidade de classe música de bardo e talento Atraente.",
         "categoria":  "Destino"
+    },
+    {
+        "id":  "imobilizacao",
+        "nome":  "Imobilização",
+        "categoria":  "Combate",
+        "preRequisitos":  "Agarrar Aprimorado.",
+        "beneficio":  "Gaste uma ação padrão e faça um teste de manobra para imobilizar criatura agarrada. A criatura fica indefesa e só pode tentar se soltar com manobra.",
+        "descricao":  "Você sabe como imobilizar um inimigo agarrado."
+    },
+    {
+        "id":  "impacto_estonteante",
+        "nome":  "Impacto Estonteante",
+        "categoria":  "Combate",
+        "preRequisitos":  "Foco em Arma (qualquer arma corpo-a-corpo de esmagamento).",
+        "beneficio":  "Ao acertar com arma de esmagamento com Foco em Arma, o oponente sofre penalidade de –1 nos ataques na rodada seguinte (ou –2 em acerto crítico).",
+        "descricao":  "Seus oponentes ficam tontos ante a força de suas pancadas."
+    },
+    {
+        "id":  "impacto_estonteante_maior",
+        "nome":  "Impacto Estonteante Maior",
+        "categoria":  "Combate",
+        "preRequisitos":  "Impacto Estonteante, bônus base de ataque +6.",
+        "beneficio":  "Como Impacto Estonteante, e o oponente deve ser bem-sucedido num teste de Reflexos (CD 10 + 1/2 nível + mod. For) ou cai no chão.",
+        "descricao":  "Suas pancadas deixam seus oponentes no chão!"
     },
     {
         "id":  "impostor",
@@ -1288,12 +1760,28 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "investida_ricochete",
+        "nome":  "Investida Ricochete",
+        "categoria":  "Combate",
+        "preRequisitos":  "Foco em Arma (qualquer arma corpo-a-corpo de esmagamento), Mobilidade.",
+        "beneficio":  "Ao fazer investida com arma de esmagamento com Foco em Arma, pode ricochetear e investir contra um segundo inimigo adjacente ao primeiro.",
+        "descricao":  "Você é capaz de ricochetear de um inimigo que tenha acabado de atacar, partindo para o próximo."
+    },
+    {
         "id":  "investigador",
         "beneficio":  "Soma seu bônus de Inteligência a testes de Obter Informação e testes de Percepção para procurar.",
         "descricao":  "Você possui mente dedutiva apurada para desvendar crimes e encontrar pistas ocultas.",
         "nome":  "Investigador",
         "preRequisitos":  "Int 13.",
         "categoria":  "Perícia"
+    },
+    {
+        "id":  "invocacao_de_monstros",
+        "nome":  "Invocação de Monstros",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Megalokk.",
+        "beneficio":  "Você pode lançar invocar monstro III uma vez por dia.",
+        "descricao":  "Você pode fazer surgir um monstro para ajudá-lo."
     },
     {
         "id":  "item_de_poder_aprimorado",
@@ -1334,6 +1822,14 @@
         "nome":  "Luz da Alvorada/Ocaso",
         "preRequisitos":  "Habilidade canalizar energia positiva (alvorada) ou negativa (ocaso).",
         "categoria":  "Destino"
+    },
+    {
+        "id":  "magia_camuflada",
+        "nome":  "Magia Camuflada",
+        "categoria":  "Magia",
+        "preRequisitos":  "Magia sem Gestos, Magia Silenciosa.",
+        "beneficio":  "Depois que você lançar uma magia, um oponente deve ser bem-sucedido num teste de Identificar Magia contra CD 25 – nível da magia para determinar quem é o conjurador. Cada magia lançada dá direito a um novo teste.",
+        "descricao":  "Mesmo em um combate, você mantém seus poderes mágicos em segredo. Bolas de fogo brotam do chão, sem que você comprometa sua identidade."
     },
     {
         "id":  "magia_congelante",
@@ -1464,6 +1960,30 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "mandibula_de_aco",
+        "nome":  "Mandíbula de Aço",
+        "categoria":  "Combate",
+        "preRequisitos":  "Gnoll ou Herança da Hiena, bônus base de ataque +2.",
+        "beneficio":  "Quando ataca com mordida, recebe +2 nas rolagens de dano e +2 em testes de agarrar e separar.",
+        "descricao":  "A hiena tem uma das mordidas mais fortes do reino animal. Você não fica atrás."
+    },
+    {
+        "id":  "mao_de_hisoka",
+        "nome":  "Mão de Hisoka",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque Desarmado Aprimorado, Ataque Poderoso, Separar Aprimorado; golpe Soco Direto; bônus base de ataque +8.",
+        "beneficio":  "Seus ataques desarmados causam dano como se você fosse uma categoria de tamanho maior (ex: Médio causa 1d8 em vez de 1d6). Acumula com monge.",
+        "descricao":  "Antigo estilo monástico de Tamu-ra baseado em socos pesados e perfurantes de alcance estendido."
+    },
+    {
+        "id":  "mao_livre",
+        "nome":  "Mão Livre",
+        "categoria":  "Combate",
+        "preRequisitos":  "Ataque Sagaz, Especialização em Combate, Esquiva; golpes Golpe Baixo e Ripostar; bônus base de ataque +5.",
+        "beneficio":  "Com uma arma de uma mão e a mão secundária livre, recebe bônus de +1 nas jogadas de ataque, jogadas de dano e CA.",
+        "descricao":  "Estilo esgrimístico ligeiro praticado por piratas e duelistas experientes."
+    },
+    {
         "id":  "maos_rapidas",
         "beneficio":  "Uma vez por rodada, pode fazer teste de Ladinagem para prestidigitação como ação livre.",
         "descricao":  "Você rouba bolsos e esconde objetos com rapidez imperceptível aos olhos comuns.",
@@ -1480,12 +2000,36 @@
         "categoria":  "Destino"
     },
     {
+        "id":  "marrada_ligeira",
+        "nome":  "Marrada Ligeira",
+        "categoria":  "Combate",
+        "preRequisitos":  "Arma natural (chifres), Ataque Poderoso, bônus base de ataque +4.",
+        "beneficio":  "Em ataque de investida com chifres, pode fazer um segundo ataque com outra arma de sua escolha (ambos com bônus +2 de investida).",
+        "descricao":  "Você pode arremeter contra seus alvos e, ao mesmo tempo, realizar outras ações."
+    },
+    {
+        "id":  "marrada_poderosa",
+        "nome":  "Marrada Poderosa",
+        "categoria":  "Combate",
+        "preRequisitos":  "Arma natural (chifres), Ataque Poderoso, bônus base de ataque +1.",
+        "beneficio":  "Em ataque de investida com os chifres, aplica o dobro de seu modificador de Força ao dano.",
+        "descricao":  "Sua cabeçada é digna de respeito."
+    },
+    {
         "id":  "maximizar_magia",
         "beneficio":  "Todos os efeitos numéricos variáveis da magia assumem seus valores máximos ao custo de +3 PM.",
         "descricao":  "Suas magias de dano ou cura causam o maior efeito possível sem necessidade de rolagem de dados.",
         "nome":  "Maximizar Magia [metamágico]",
         "preRequisitos":  "Nenhum.",
         "categoria":  "Magia"
+    },
+    {
+        "id":  "medico_de_campo",
+        "nome":  "Médico de Campo",
+        "categoria":  "Magia",
+        "preRequisitos":  "Capacidade de lançar magias divinas de 1º nível.",
+        "beneficio":  "Você pode usar uma magia de curar ferimentos em um aliado até uma rodada depois de sua morte.",
+        "descricao":  "Você está acostumado a correr sob saraivadas de flechas, para salvar a vida de companheiros e soldados caídos."
     },
     {
         "id":  "melodia_fortalecedora",
@@ -1510,6 +2054,14 @@
         "nome":  "Membros Estendidos",
         "preRequisitos":  "Nenhum.",
         "categoria":  "Tormenta"
+    },
+    {
+        "id":  "memoria_racial",
+        "nome":  "Memória Racial",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Allihanna ou Megalokk.",
+        "beneficio":  "Você recebe +4 em testes de Sobrevivência e CA +1 em ambientes naturais.",
+        "descricao":  "Você pode acessar lembranças de seus ancestrais selvagens para superar desafios."
     },
     {
         "id":  "mente_caotica",
@@ -1560,6 +2112,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "mestre_em_customizacao",
+        "nome":  "Mestre em Customização",
+        "categoria":  "Magia",
+        "preRequisitos":  "Artífice 4º nível.",
+        "beneficio":  "Você reduz em 20% todos os custos relacionados a seu companheiro autômato, incluindo modificações.",
+        "descricao":  "Seu autômato é cheio de melhorias."
+    },
+    {
         "id":  "mira_apurada",
         "beneficio":  "Você pode gastar uma ação de movimento para mirar um alvo recebendo +1 em jogadas de ataque à distância realizadas contra ele na mesma rodada.",
         "descricao":  "Seus tiros têm precisão mortal ao mirar com calma.",
@@ -1582,6 +2142,22 @@
         "nome":  "Mobilidade",
         "preRequisitos":  "Des 13, Esquiva.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "mobilidade_perfeita",
+        "nome":  "Mobilidade Perfeita",
+        "categoria":  "Combate",
+        "preRequisitos":  "Mobilidade.",
+        "beneficio":  "Você recebe +2 em testes de resistência sempre que usar uma ação de movimento para se deslocar em combate. Não provoca ataques de oportunidade por se deslocar.",
+        "descricao":  "Você é um relâmpago no campo de batalha — até mesmo magias têm dificuldade em atingi-lo!"
+    },
+    {
+        "id":  "morte_vinda_do_ceu",
+        "nome":  "Morte Vinda do Céu",
+        "categoria":  "Combate",
+        "preRequisitos":  "Habilidade de classe fúria, treinado em Atletismo.",
+        "beneficio":  "Em fúria ao fazer uma investida, você pode saltar em direção ao inimigo, ignorando terreno difícil e obstáculos baixos.",
+        "descricao":  "Você salta com selvageria sobre seus oponentes!"
     },
     {
         "id":  "musica_bombastica",
@@ -1632,6 +2208,30 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "olho_marcial",
+        "nome":  "Olho Marcial",
+        "categoria":  "Perícia",
+        "preRequisitos":  "Treinado em Percepção.",
+        "beneficio":  "Faça um teste de Percepção (CD 10 + nível do oponente) como ação de movimento. Em caso de sucesso, você descobre sua classe de armadura, bônus de ataque ou quantidade de pontos de vida atual. Novos testes revelam as informações restantes.",
+        "descricao":  "Você é capaz de avaliar um oponente, descobrindo seus pontos fortes e fracos."
+    },
+    {
+        "id":  "olhos_nas_costas",
+        "nome":  "Olhos nas Costas",
+        "categoria":  "Combate",
+        "preRequisitos":  "Treinado em Percepção, Mobilidade.",
+        "beneficio":  "Na primeira vez em que for flanqueado em um combate, pode realizar um ataque imediato contra um dos oponentes antes que ele ataque e em seguida mover-se 1,5m em qualquer direção.",
+        "descricao":  "Você está prevenido contra inimigos que atacam pelas costas."
+    },
+    {
+        "id":  "ousadia",
+        "nome":  "Ousadia",
+        "categoria":  "Destino",
+        "preRequisitos":  "Nenhum.",
+        "beneficio":  "Quando você faz um ato de heroísmo recebe dois pontos de ação, em vez de um.",
+        "descricao":  "Para alguém acostumado à guerra, o perigo pode ser um vício. O risco de morte é um verdadeiro combustível."
+    },
+    {
         "id":  "outra_face",
         "descricao":  "Você revida um ataque com um perdão.",
         "beneficio":  "Ao ser atingido com sucesso por um inimigo, perdoe-o para impor penalidade cumulativa de –1 em todas as jogadas de ataque dele na cena (anulada se você atacá-lo).",
@@ -1646,6 +2246,22 @@
         "nome":  "Panache",
         "preRequisitos":  "Car 13, Fintar Aprimorado.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "parede_de_escudos",
+        "nome":  "Parede de Escudos",
+        "categoria":  "Combate",
+        "preRequisitos":  "Falange.",
+        "beneficio":  "Se você estiver participando de uma falange, pode fazer um ataque corpo-a-corpo imediato contra qualquer criatura que se mova para ficar adjacente a você ou aos aliados adjacentes a você (uma vez por rodada).",
+        "descricao":  "Ao lado de seus companheiros, seu escudo é uma defesa impenetrável."
+    },
+    {
+        "id":  "pequeno_moreau",
+        "nome":  "Pequeno Moreau",
+        "categoria":  "Destino",
+        "preRequisitos":  "Herança da Coruja, Coelho, Gato, Morcego, Raposa ou Serpente.",
+        "beneficio":  "Você tem tamanho Pequeno: recebe CA +1, +1 nas jogadas de ataque, +4 em Furtividade, precisa de armas menores e sofre –4 em testes de manobra. Especial: apenas no 1º nível.",
+        "descricao":  "Por descender de um animal pequeno, você é menor e mais ágil que outros moreau."
     },
     {
         "id":  "perito_em_arma",
@@ -1712,6 +2328,14 @@
         "categoria":  "Magia"
     },
     {
+        "id":  "pontaria_com_varinha",
+        "nome":  "Pontaria com Varinha",
+        "categoria":  "Magia",
+        "preRequisitos":  "Artífice 1º nível ou capacidade de lançar magias arcanas de 3º nível.",
+        "beneficio":  "Você recebe +2 em ataques de toque à distância com varinhas.",
+        "descricao":  "Cuidado para onde aponta essa coisa!"
+    },
+    {
         "id":  "potencializar_invocacao",
         "beneficio":  "As criaturas que você invoca com as magias invocar monstro recebem +2 nas jogadas de ataque e dano.",
         "descricao":  "Seus construtos e servos convocados de energia surgem mais vigorosos e agressivos.",
@@ -1742,6 +2366,22 @@
         "nome":  "Preparar Armadilhas de Covil",
         "preRequisitos":  "Preparar Armadilhas.",
         "categoria":  "Perícia"
+    },
+    {
+        "id":  "presenca_aterradora",
+        "nome":  "Presença Aterradora",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Carisma 15, 5º nível de personagem, devoto de Kallyadranoch, Megalokk, Ragnar ou Tenebra.",
+        "beneficio":  "Como ação livre (1 vez por rodada), inimigos a até 9m devem ser bem-sucedidos em Vontade (CD 10 + 1/2 nível + mod. Car) ou ficam abalados por 1 minuto. Não afeta criaturas de nível superior.",
+        "descricao":  "Você pode abalar seus inimigos."
+    },
+    {
+        "id":  "presenca_aterradora_aprimorada",
+        "nome":  "Presença Aterradora Aprimorada",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Presença Aterradora, 10º nível de personagem.",
+        "beneficio":  "Ao usar o talento Presença Aterradora, as vítimas que falharem no teste ficam apavoradas em vez de abaladas.",
+        "descricao":  "Você pode apavorar seus inimigos."
     },
     {
         "id":  "profeta_do_caos",
@@ -1848,12 +2488,44 @@
         "categoria":  "Tormenta"
     },
     {
+        "id":  "retroceder_nunca_render_se_jamais",
+        "nome":  "Retroceder Nunca, Render-se Jamais",
+        "categoria":  "Combate",
+        "preRequisitos":  "Vitalidade, Vontade de Ferro.",
+        "beneficio":  "Quando estiver com menos da metade dos PV totais, recebe +2 na CA e em todos os testes de resistência (+4 se todos os aliados estiverem caídos).",
+        "descricao":  "Você não desiste!"
+    },
+    {
+        "id":  "rigidez_raivosa",
+        "nome":  "Rigidez Raivosa",
+        "categoria":  "Combate",
+        "preRequisitos":  "Casca Grossa, Fortitude Maior.",
+        "beneficio":  "Sempre que sofrer dano físico, recebe redução de dano 1 cumulativa com outras fontes (ex: três golpes = RD 3). Efeito termina ao recuperar PV ou no fim do combate.",
+        "descricao":  "Ser ferido não o abala, só aumenta sua resolução."
+    },
+    {
+        "id":  "rosto_de_azgher",
+        "nome":  "Rosto de Azgher",
+        "categoria":  "Combate",
+        "preRequisitos":  "Treinado em Atuação (dança), Foco em Arma (cimitarra), Mobilidade; golpes Ataque em Arco e Golpe em V; bônus base de ataque +5.",
+        "beneficio":  "Ação de movimento para teste de Atuação oposto por Vontade de inimigos a até 9m. Oponentes que falharem ficam desprevenidos até o início de seus próximos turnos.",
+        "descricao":  "Dança de combate do Deserto da Perdição que confunde opositores com giros de lâminas ofuscantes."
+    },
+    {
         "id":  "sacerdote_copista",
         "descricao":  "Anos de prática copiando documentos aprimoraram a criação de pergaminhos.",
         "beneficio":  "Pode adicionar talentos metamágicos (Aumentar Magia, Estender Magia, Potencializar Invocação, Potencializar Magia) aos pergaminhos que criar.",
         "nome":  "Sacerdote Copista",
         "preRequisitos":  "Classe clérigo, treinado em Ofício (caligrafia), Escrever Pergaminhos.",
         "categoria":  "Magia"
+    },
+    {
+        "id":  "saliva_venenosa",
+        "nome":  "Saliva Venenosa",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Kallyadranoch, Megalokk ou Sszzaas.",
+        "beneficio":  "Uma vez por dia, com ação padrão, pode cuspir veneno em criatura adjacente (Fortitude CD 10 + 1/2 nível + mod. Con ou 1d4 Con após 1 min, +1d4 a cada 8 níveis). Se possuir Usar Venenos, pode aplicar em uma arma por 1 minuto.",
+        "descricao":  "Seus lábios gotejam veneno mortal."
     },
     {
         "id":  "salto_para_a_salvacao",
@@ -1952,6 +2624,14 @@
         "categoria":  "Magia"
     },
     {
+        "id":  "sucesso_atrai_sucesso",
+        "nome":  "Sucesso Atrai Sucesso",
+        "categoria":  "Combate",
+        "preRequisitos":  "Bônus base de ataque +6.",
+        "beneficio":  "Gaste 1 ponto de ação na 1ª rodada do combate: cada acerto crítico que fizer durante a luta aumenta sua margem de ameaça em +1 ponto até o fim do combate.",
+        "descricao":  "Uma vez que entre no ritmo do combate, você se torna invencível."
+    },
+    {
         "id":  "surto_heroico",
         "beneficio":  "Uma vez por dia, pode realizar uma ação padrão ou de movimento adicional na rodada.",
         "descricao":  "Em momentos de desespero moral, uma centelha interior permite que aja além dos limites mortais.",
@@ -2022,6 +2702,14 @@
         "nome":  "Tiro em Movimento",
         "preRequisitos":  "Des 13, Esquiva, Mobilidade, Tiro Certeiro, bônus base de ataque +4.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "tiro_especial",
+        "nome":  "Tiro Especial",
+        "categoria":  "Combate",
+        "preRequisitos":  "Destreza 15, Tiro Certeiro, Tiro Preciso, bônus base de ataque +4.",
+        "beneficio":  "Você pode realizar as manobras derrubar, desarmar e empurrar utilizando ataques à distância com seu bônus de ataque à distância.",
+        "descricao":  "Você é capaz de disparos espantosos, capazes de derrubar, desarmar ou empurrar seus inimigos."
     },
     {
         "id":  "tiro_longo",
@@ -2096,6 +2784,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "treinado_em_escola",
+        "nome":  "Treinado em Escola",
+        "categoria":  "Combate",
+        "preRequisitos":  "Variável (veja o texto da escola de combate).",
+        "beneficio":  "Você adquire o estilo e benefícios de uma escola de combate. Cada escola é um talento separado (Artilharia Pesada, Dança do Leopardo, Escola das Armas de Haste, Escola das Duas Mãos, Escudo de Tauron, Guarda de Theudric, Mão de Hisoka, Mão Livre, Rosto de Azgher).",
+        "descricao":  "Você foi treinado em uma escola de combate específica, recebendo grande conhecimento em troca de dedicação."
+    },
+    {
         "id":  "treino_em_pericia",
         "beneficio":  "Você se torna treinado na perícia escolhida (adquirível várias vezes para perícias diferentes).",
         "descricao":  "Você se dedicou aos estudos ou à prática de uma habilidade em que antes era leigo.",
@@ -2126,6 +2822,14 @@
         "nome":  "Truque do Chapéu",
         "preRequisitos":  "Fintar Aprimorado, Sacar Rápido.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "truque_do_desarme",
+        "nome":  "Truque do Desarme",
+        "categoria":  "Combate",
+        "preRequisitos":  "Bloqueio Ambidestro.",
+        "beneficio":  "Gaste uma ação completa para ganhar +4 em CA durante uma rodada. Todos os inimigos que atacarem em corpo-a-corpo e errarem são desarmados automaticamente (Intuição CD 20 evita atacar).",
+        "descricao":  "Você é capaz de enganar seus oponentes, aparando suas armas de forma a arrancá-las de suas mãos."
     },
     {
         "id":  "usar_arma_exotica",
@@ -2176,6 +2880,14 @@
         "categoria":  "Combate"
     },
     {
+        "id":  "usar_escudo_de_corpo",
+        "nome":  "Usar Escudo de Corpo",
+        "categoria":  "Combate",
+        "preRequisitos":  "Usar Escudo.",
+        "beneficio":  "Você sabe usar escudos de corpo sem aplicar sua penalidade de armadura em jogadas de ataque e testes de perícias baseadas em Força e Destreza.",
+        "descricao":  "Você sabe lutar com escudos de corpo com destreza militar."
+    },
+    {
         "id":  "usar_escudos",
         "beneficio":  "Você sabe usar escudos leves e pesados mantendo sua proteção.",
         "descricao":  "Você é treinado para bloquear golpes inimigos com escudos.",
@@ -2190,6 +2902,14 @@
         "nome":  "Usar Venenos",
         "preRequisitos":  "Treinado em Ofício (alquimia), tendência não Bondosa.",
         "categoria":  "Combate"
+    },
+    {
+        "id":  "vencedor_de_limites",
+        "nome":  "Vencedor de Limites",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Champarr.",
+        "beneficio":  "Uma vez por dia, como ação livre, soma seu nível de personagem a uma habilidade básica à sua escolha durante um minuto.",
+        "descricao":  "Você pode realizar uma demonstração de habilidade sobrenatural."
     },
     {
         "id":  "visao_ampla",
@@ -2230,5 +2950,21 @@
         "nome":  "Vontade de Ferro",
         "preRequisitos":  "Nenhum.",
         "categoria":  "Destino"
+    },
+    {
+        "id":  "voz_de_allihanna",
+        "nome":  "Voz de Allihanna",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Domínio dos Animais, devoto de Allihanna.",
+        "beneficio":  "Você pode lançar dominar animal uma vez por dia sem gastar PM (CD 10 + 1/2 nível + mod. Car).",
+        "descricao":  "Você pode dominar animais."
+    },
+    {
+        "id":  "voz_de_megalokk",
+        "nome":  "Voz de Megalokk",
+        "categoria":  "Poderes Concedidos",
+        "preRequisitos":  "Devoto de Megalokk.",
+        "beneficio":  "Você conhece os idiomas de todos os monstros inteligentes (Int 3+) e pode se comunicar livremente com monstros não inteligentes (Int 1 ou 2) como em falar com animais (não funciona com lefeu).",
+        "descricao":  "Você pode falar com monstros."
     }
 ]
