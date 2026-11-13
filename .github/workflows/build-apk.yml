@@ -35,8 +35,11 @@ jobs:
         working-directory: ./android
         run: ./gradlew assembleRelease --no-daemon
 
+      - name: Renomear arquivo APK
+        run: mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/Tormenta-RPG-Ficha.apk
+
       - name: Publicar APK para Download nos Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: Tormenta-RPG-Ficha-APK
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: Tormenta-RPG-Ficha
+          path: android/app/build/outputs/apk/release/Tormenta-RPG-Ficha.apk
