@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   ATRIBUTOS_LISTA,
   calcularCaTotal,
@@ -21,9 +21,58 @@ interface Props {
 export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
   const meioNivel = obterMeioNivel(ficha.nivel);
   const modDes = calcularModificador(ficha.destreza);
+  const modCon = calcularModificador(ficha.constituicao);
+  const modSab = calcularModificador(ficha.sabedoria);
   const bonusArmadura = obterBonusArmaduraEquipada(ficha);
   const bonusEscudo = obterBonusEscudoEquipado(ficha);
   const caTotal = calcularCaTotal(ficha);
+
+  const fortOutros = Number(ficha.fortitudeOutros) || 0;
+  const refOutros = Number(ficha.reflexosOutros) || 0;
+  const vonOutros = Number(ficha.vontadeOutros) || 0;
+
+  const fortTotal = meioNivel + modCon + fortOutros;
+  const refTotal = meioNivel + modDes + refOutros;
+  const vonTotal = meioNivel + modSab + vonOutros;
+
+  const handleDescansoLongo = () => {
+    onChange({
+      ...ficha,
+      pvAtual: ficha.pvTotal,
+      pmAtual: ficha.pmTotal,
+    });
+    Alert.alert(
+      'Descanso Longo',
+      'Todos os seus atributos atuais (PV e PM) foram recuperados aos valores máximos!'
+    );
+  };
+
+  const resistencias = [
+    {
+      chave: 'fortitudeOutros' as const,
+      nome: 'Fortitude',
+      atrib: 'CON',
+      mod: modCon,
+      outros: fortOutros,
+      total: fortTotal,
+    },
+    {
+      chave: 'reflexosOutros' as const,
+      nome: 'Reflexos',
+      atrib: 'DES',
+      mod: modDes,
+      outros: refOutros,
+      total: refTotal,
+    },
+    {
+      chave: 'vontadeOutros' as const,
+      nome: 'Vontade',
+      atrib: 'SAB',
+      mod: modSab,
+      outros: vonOutros,
+      total: vonTotal,
+    },
+  ];
 
   return (
     <ScrollView
@@ -35,7 +84,7 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
       <View style={styles.card}>
         <SecaoHeader
           titulo="1. Dados Cadastrais"
-          subtitulo="Identificação básica do personagem"
+          subtitulo="Informações pessoais do personagem"
         />
         <View style={styles.cardBody}>
           <CampoTexto
@@ -133,8 +182,8 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
       {/* 2. ATRIBUTOS PRINCIPAIS E SEUS MODIFICADORES */}
       <View style={styles.card}>
         <SecaoHeader
-          titulo="2. Atributos Principais"
-          subtitulo="Labels, valores e o modificador calculado ao lado"
+          titulo="2. Atributos Base"
+          subtitulo="Valores de atributos e modificadores"
         />
         <View style={styles.cardBody}>
           {ATRIBUTOS_LISTA.map((atrib, idx) => {
@@ -170,13 +219,25 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
         </View>
       </View>
 
-      {/* 3. PV, PM, BBA E NÍVEL */}
+      {/* 3. PV, PM, BBA, CA E RESISTÊNCIAS UNIFICADOS */}
       <View style={styles.card}>
         <SecaoHeader
-          titulo="PV, PM, BBA e Nível"
-          subtitulo="Pontos de Vida, Pontos de Magia e Bônus Base de Ataque"
+          titulo="3. Outros Atributos e Resistências"
+          subtitulo="PV, PM, BBA, Classe de Armadura (CA) e Resistências"
         />
         <View style={styles.cardBody}>
+          <TouchableOpacity
+            style={styles.btnDescansoLongo}
+            onPress={handleDescansoLongo}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.btnDescansoLongoText}>Descanso Longo</Text>
+            <Text style={styles.btnDescansoLongoSub}>
+              Recuperar PV e PM atuais para os valores máximos
+            </Text>
+          </TouchableOpacity>
+
+          {/* PV */}
           <View style={styles.statusSubBox}>
             <Text style={styles.statusGroupTitle}>PONTOS DE VIDA (PV)</Text>
             <View style={styles.row}>
@@ -199,6 +260,7 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
             </View>
           </View>
 
+          {/* PM */}
           <View style={styles.statusSubBox}>
             <Text style={styles.statusGroupTitle}>PONTOS DE MAGIA (PM)</Text>
             <View style={styles.row}>
@@ -221,6 +283,7 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
             </View>
           </View>
 
+          {/* BBA e Nível */}
           <View style={styles.row}>
             <CampoInteiro
               label="BBA (Bônus Base de Ataque)"
@@ -242,16 +305,11 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
           <Text style={styles.helperText}>
             Metade do Nível (1/2 nível) = +{meioNivel}
           </Text>
-        </View>
-      </View>
 
-      {/* 4. CLASSE DE ARMADURA (CA) */}
-      <View style={styles.card}>
-        <SecaoHeader
-          titulo="Classe de Armadura (CA)"
-          subtitulo="10 + 1/2 nível + mod_des + armadura + escudo + tamanho + outros"
-        />
-        <View style={styles.cardBody}>
+          <View style={styles.sectionDivider} />
+
+          {/* CLASSE DE ARMADURA (CA) */}
+          <Text style={styles.subSectionHeaderTitle}>CLASSE DE ARMADURA (CA)</Text>
           <View style={styles.caBanner}>
             <View style={styles.caBannerLeft}>
               <Text style={styles.caBannerTitle}>CA TOTAL</Text>
@@ -289,10 +347,6 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
             </View>
           </View>
 
-          <Text style={styles.helperText}>
-            Preenchimento manual da CA (Armadura e Escudo são somados das proteções equipadas na aba Equipamentos):
-          </Text>
-
           <View style={styles.row}>
             <CampoInteiro
               label="Bônus de Tamanho (CA)"
@@ -310,6 +364,64 @@ export const AbaDadosEAtributos: React.FC<Props> = ({ ficha, onChange }) => {
               max={99}
               style={styles.col}
             />
+          </View>
+
+          <View style={styles.sectionDivider} />
+
+          {/* RESISTÊNCIAS */}
+          <Text style={styles.subSectionHeaderTitle}>
+            RESISTÊNCIAS (1/2 NÍVEL + MOD. HABILIDADE + OUTROS)
+          </Text>
+
+          <View style={styles.resTable}>
+            <View style={styles.resHeaderRow}>
+              <Text style={[styles.resTh, styles.resColNome]}>Resistência</Text>
+              <Text style={[styles.resTh, styles.resColNum]}>1/2 Nív</Text>
+              <Text style={[styles.resTh, styles.resColNum]}>Mod.</Text>
+              <Text style={[styles.resTh, styles.resColOutros]}>Outros</Text>
+              <Text style={[styles.resTh, styles.resColTotal]}>Total</Text>
+            </View>
+
+            {resistencias.map((res, idx) => (
+              <View
+                key={res.chave}
+                style={[
+                  styles.resRow,
+                  idx < resistencias.length - 1 && styles.atributoDivider,
+                ]}
+              >
+                <View style={styles.resColNome}>
+                  <Text style={styles.resNomeText}>{res.nome}</Text>
+                  <Text style={styles.resAtribText}>{res.atrib}</Text>
+                </View>
+
+                <Text style={[styles.resCellText, styles.resColNum]}>
+                  +{meioNivel}
+                </Text>
+
+                <Text style={[styles.resCellText, styles.resColNum]}>
+                  {formatarModificador(res.mod)}
+                </Text>
+
+                <View style={styles.resColOutros}>
+                  <CampoInteiro
+                    valor={res.outros}
+                    onValorChange={(novo) =>
+                      onChange({ ...ficha, [res.chave]: novo })
+                    }
+                    min={-99}
+                    max={99}
+                    compact
+                  />
+                </View>
+
+                <View style={styles.resTotalBadge}>
+                  <Text style={styles.resTotalText}>
+                    {formatarModificador(res.total)}
+                  </Text>
+                </View>
+              </View>
+            ))}
           </View>
         </View>
       </View>
@@ -398,6 +510,27 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  btnDescansoLongo: {
+    backgroundColor: COLORS.primary,
+    borderWidth: 1.5,
+    borderColor: COLORS.gold,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnDescansoLongoText: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  btnDescansoLongoSub: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 11,
+    marginTop: 2,
+  },
   statusGroupTitle: {
     fontSize: 12,
     fontWeight: 'bold',
@@ -409,6 +542,17 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 6,
     marginBottom: 4,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 14,
+  },
+  subSectionHeaderTitle: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: 8,
   },
   caBanner: {
     backgroundColor: COLORS.surfaceVariant,
@@ -466,5 +610,75 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.primary,
   },
+  resTable: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  resHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceVariant,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  resTh: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  resRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+  },
+  resColNome: {
+    flex: 1,
+    textAlign: 'left',
+  },
+  resColNum: {
+    width: 44,
+    textAlign: 'center',
+  },
+  resColOutros: {
+    width: 64,
+    paddingHorizontal: 4,
+  },
+  resColTotal: {
+    width: 52,
+    textAlign: 'center',
+  },
+  resNomeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  resAtribText: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+  },
+  resCellText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
+  resTotalBadge: {
+    width: 48,
+    marginLeft: 4,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resTotalText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.white,
+  },
 });
-

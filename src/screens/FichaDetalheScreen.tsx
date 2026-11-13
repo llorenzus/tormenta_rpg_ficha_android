@@ -20,6 +20,7 @@ interface Props {
   ficha: FichaPersonagem;
   onChange: (nova: FichaPersonagem) => void;
   onSalvarManual: () => void;
+  onExportar: () => void;
   onVoltar: () => void;
 }
 
@@ -34,6 +35,7 @@ export const FichaDetalheScreen: React.FC<Props> = ({
   ficha,
   onChange,
   onSalvarManual,
+  onExportar,
   onVoltar,
 }) => {
   const [abaAtiva, setAbaAtiva] = useState(0);
@@ -65,9 +67,14 @@ export const FichaDetalheScreen: React.FC<Props> = ({
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSalvarClick}>
-          <Text style={styles.saveBtnText}>Salvar</Text>
-        </TouchableOpacity>
+        <View style={styles.topRightActions}>
+          <TouchableOpacity style={styles.exportBtn} onPress={onExportar}>
+            <Text style={styles.exportBtnText}>Exportar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.saveBtn} onPress={handleSalvarClick}>
+            <Text style={styles.saveBtnText}>Salvar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Abas na ordem solicitada */}
@@ -120,15 +127,16 @@ const styles = StyleSheet.create({
   },
   topBar: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 6,
   },
   backBtn: {
     paddingVertical: 6,
-    paddingRight: 10,
+    paddingRight: 6,
   },
   backBtnText: {
     color: COLORS.white,
@@ -137,21 +145,39 @@ const styles = StyleSheet.create({
   },
   titleCol: {
     flex: 1,
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
   },
   titleText: {
     color: COLORS.white,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 15,
   },
   subtitleText: {
     color: 'rgba(255,255,255,0.88)',
     fontSize: 11,
     marginTop: 1,
   },
+  topRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  exportBtn: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  exportBtnText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
   saveBtn: {
     backgroundColor: COLORS.gold,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
   },
@@ -190,4 +216,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

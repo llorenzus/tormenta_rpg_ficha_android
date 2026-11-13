@@ -17,6 +17,8 @@ import { COLORS } from '../theme/colors';
 interface Props {
   fichas: FichaPersonagem[];
   onCriarNova: () => void;
+  onImportarFicha: () => void;
+  onExportarFicha: (ficha: FichaPersonagem) => void;
   onAbrirFicha: (ficha: FichaPersonagem) => void;
   onExcluirFicha: (id: string) => void;
 }
@@ -24,6 +26,8 @@ interface Props {
 export const ListaFichasScreen: React.FC<Props> = ({
   fichas,
   onCriarNova,
+  onImportarFicha,
+  onExportarFicha,
   onAbrirFicha,
   onExcluirFicha,
 }) => {
@@ -46,13 +50,21 @@ export const ListaFichasScreen: React.FC<Props> = ({
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <View>
+        <View style={styles.topBarLeft}>
           <Text style={styles.topBarTitle}>Tormenta RPG</Text>
           <Text style={styles.topBarSubtitle}>Gerenciador de Fichas Locais</Text>
         </View>
-        <TouchableOpacity style={styles.btnTopNova} onPress={onCriarNova}>
-          <Text style={styles.btnTopNovaText}>+ Nova Ficha</Text>
-        </TouchableOpacity>
+        <View style={styles.topActionsRow}>
+          <TouchableOpacity
+            style={styles.btnTopImportar}
+            onPress={onImportarFicha}
+          >
+            <Text style={styles.btnTopImportarText}>Importar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnTopNova} onPress={onCriarNova}>
+            <Text style={styles.btnTopNovaText}>+ Nova</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {fichas.length === 0 ? (
@@ -60,12 +72,27 @@ export const ListaFichasScreen: React.FC<Props> = ({
           <View style={styles.emptyCard}>
             <Text style={styles.emptyTitle}>Nenhuma ficha salva ainda</Text>
             <Text style={styles.emptyDesc}>
-              Toque em "+ Nova Ficha" para criar seu personagem de Tormenta RPG.
-              Todas as fichas ficam salvas localmente no seu celular.
+              Toque em "+ Criar Personagem" para criar sua ficha de Tormenta RPG
+              ou importe um arquivo .txt enviado por um amigo.
             </Text>
-            <TouchableOpacity style={styles.btnCriarGrande} onPress={onCriarNova}>
-              <Text style={styles.btnCriarGrandeText}>+ Criar Personagem</Text>
-            </TouchableOpacity>
+            <View style={styles.emptyActionsCol}>
+              <TouchableOpacity
+                style={styles.btnCriarGrande}
+                onPress={onCriarNova}
+              >
+                <Text style={styles.btnCriarGrandeText}>
+                  + Criar Personagem
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnImportarGrande}
+                onPress={onImportarFicha}
+              >
+                <Text style={styles.btnImportarGrandeText}>
+                  Importar Ficha
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       ) : (
@@ -96,12 +123,20 @@ export const ListaFichasScreen: React.FC<Props> = ({
                     </Text>
                     <Text style={styles.fichaSub}>{subtitulo}</Text>
                   </View>
-                  <TouchableOpacity
-                    style={styles.btnDelete}
-                    onPress={() => confirmarExclusao(item)}
-                  >
-                    <Text style={styles.btnDeleteText}>Excluir</Text>
-                  </TouchableOpacity>
+                  <View style={styles.cardActionsRow}>
+                    <TouchableOpacity
+                      style={styles.btnExport}
+                      onPress={() => onExportarFicha(item)}
+                    >
+                      <Text style={styles.btnExportText}>Exportar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.btnDelete}
+                      onPress={() => confirmarExclusao(item)}
+                    >
+                      <Text style={styles.btnDeleteText}>Excluir</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 <View style={styles.badgesRow}>
@@ -144,24 +179,46 @@ const styles = StyleSheet.create({
   },
   topBar: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 8,
+  },
+  topBarLeft: {
+    flex: 1,
   },
   topBarTitle: {
     color: COLORS.white,
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: 'bold',
   },
   topBarSubtitle: {
     color: 'rgba(255,255,255,0.85)',
+    fontSize: 11,
+  },
+  topActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  btnTopImportar: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  btnTopImportarText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
     fontSize: 12,
   },
   btnTopNova: {
     backgroundColor: COLORS.gold,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },
@@ -196,14 +253,33 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     lineHeight: 20,
   },
+  emptyActionsCol: {
+    width: '100%',
+    gap: 10,
+  },
   btnCriarGrande: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 10,
+    alignItems: 'center',
   },
   btnCriarGrandeText: {
     color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  btnImportarGrande: {
+    backgroundColor: COLORS.surfaceVariant,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  btnImportarGrandeText: {
+    color: COLORS.primary,
     fontWeight: 'bold',
     fontSize: 15,
   },
@@ -239,8 +315,26 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 2,
   },
+  cardActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  btnExport: {
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 6,
+    backgroundColor: COLORS.surfaceVariant,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  btnExportText: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   btnDelete: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 5,
     borderRadius: 6,
     backgroundColor: 'rgba(179,38,30,0.1)',
@@ -279,4 +373,3 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 });
-

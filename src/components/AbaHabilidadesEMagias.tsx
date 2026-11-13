@@ -163,15 +163,7 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
                           onChangeText={(v) =>
                             atualizarMagia({ ...magia, nome: v })
                           }
-                          style={styles.colNomeMagia}
-                        />
-                        <CampoTexto
-                          label="PM"
-                          value={magia.custoPm}
-                          onChangeText={(v) =>
-                            atualizarMagia({ ...magia, custoPm: v })
-                          }
-                          style={styles.colPmMagia}
+                          style={styles.colFlex}
                         />
                         <TouchableOpacity
                           style={styles.btnRemove}

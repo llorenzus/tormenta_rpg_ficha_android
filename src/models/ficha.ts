@@ -27,6 +27,7 @@ export interface PericiaItem {
   somenteTreinada?: boolean;
   treinada: boolean;
   outrosBonus: number;
+  complemento?: string;
 }
 
 export interface HabilidadeOuTalento {
@@ -92,7 +93,7 @@ export interface FichaPersonagem {
   sabedoria: number;
   carisma: number;
 
-  // Status de Combate: PV, PM, BBA e CA (campos manuais)
+  // Status de Combate: PV, PM, BBA, CA e Resistências (campos manuais)
   pvTotal: number;
   pvAtual: number;
   pmTotal: number;
@@ -100,6 +101,9 @@ export interface FichaPersonagem {
   bba: number;
   caBonusTamanho: number;
   caOutrosBonus: number;
+  fortitudeOutros: number;
+  reflexosOutros: number;
+  vontadeOutros: number;
 
   // 3. Perícias
   pericias: PericiaItem[];
@@ -262,6 +266,9 @@ export function criarNovaFichaPadrao(): FichaPersonagem {
     bba: 0,
     caBonusTamanho: 0,
     caOutrosBonus: 0,
+    fortitudeOutros: 0,
+    reflexosOutros: 0,
+    vontadeOutros: 0,
     pericias: criarPericiasPadrao(),
     habilidadesRaca: [],
     habilidadesClasse: [],

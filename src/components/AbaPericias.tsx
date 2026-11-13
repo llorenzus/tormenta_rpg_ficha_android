@@ -4,11 +4,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {
-  ATRIBUTOS_LISTA,
   AtributoSigla,
   calcularGraduacaoPericia,
   calcularTotalPericia,
@@ -26,10 +26,66 @@ interface Props {
   onChange: (nova: FichaPersonagem) => void;
 }
 
+type TipoPericiaComplementar = 'Atuação' | 'Conhecimento' | 'Ofício';
+
+interface ConfigPericiaComplementar {
+  nomeBase: TipoPericiaComplementar;
+  atributoChave: AtributoSigla;
+  somenteTreinada?: boolean;
+  placeholder: string;
+}
+
+const PERICIAS_COMPLEMENTARES: ConfigPericiaComplementar[] = [
+  {
+    nomeBase: 'Atuação',
+    atributoChave: 'CAR',
+    somenteTreinada: false,
+    placeholder: 'Ex: Música, Teatro...',
+  },
+  {
+    nomeBase: 'Conhecimento',
+    atributoChave: 'INT',
+    somenteTreinada: true,
+    placeholder: 'Ex: Arcano, Religião...',
+  },
+  {
+    nomeBase: 'Ofício',
+    atributoChave: 'INT',
+    somenteTreinada: false,
+    placeholder: 'Ex: Alquimia, Ferreiro...',
+  },
+];
+
+function obterConfigComplementar(
+  pericia: PericiaItem
+): ConfigPericiaComplementar | undefined {
+  const nomeLimpo = pericia.nome.trim();
+  return PERICIAS_COMPLEMENTARES.find(
+    (cfg) =>
+      nomeLimpo === cfg.nomeBase ||
+      nomeLimpo.startsWith(`${cfg.nomeBase} (`) ||
+      nomeLimpo.startsWith(`${cfg.nomeBase}(`)
+  );
+}
+
+function extrairComplemento(pericia: PericiaItem): string {
+  if (typeof pericia.complemento === 'string') {
+    return pericia.complemento;
+  }
+  const match = pericia.nome.match(/^[^(]+\((.*)\)$/);
+  return match ? match[1] : '';
+}
+
+function montarNomeComComplemento(nomeBase: string, complemento: string): string {
+  const limpo = complemento.trim();
+  return limpo ? `${nomeBase} (${limpo})` : nomeBase;
+}
+
 export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
   const [modalVisivel, setModalVisivel] = useState(false);
-  const [novoNome, setNovoNome] = useState('Ofício ()');
-  const [novoAtrib, setNovoAtrib] = useState<AtributoSigla>('INT');
+  const [tipoSelecionado, setTipoSelecionado] =
+    useState<TipoPericiaComplementar>('Ofício');
+  const [novoComplemento, setNovoComplemento] = useState('');
 
   const alternarTreinada = (periciaId: string) => {
     const novaLista = ficha.pericias.map((p) =>
@@ -45,19 +101,80 @@ export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
     onChange({ ...ficha, pericias: novaLista });
   };
 
-  const adicionarPericiaExtra = () => {
-    if (!novoNome.trim()) return;
+  const alterarComplemento = (
+    periciaId: string,
+    nomeBase: TipoPericiaComplementar,
+    complemento: string
+  ) => {
+    const novaLista = ficha.pericias.map((p) =>
+      p.id === periciaId
+        ? {
+            ...p,
+            complemento,
+            nome: montarNomeComComplemento(nomeBase, complemento),
+          }
+        : p
+    );
+    onChange({ ...ficha, pericias: novaLista });
+  };
+
+  const abrirModalParaTipo = (tipo: TipoPericiaComplementar) => {
+    setTipoSelecionado(tipo);
+    setNovoComplemento('');
+    setModalVisivel(true);
+  };
+
+  const adicionarPericiaComplementar = () => {
+    const cfg =
+      PERICIAS_COMPLEMENTARES.find((c) => c.nomeBase === tipoSelecionado) ||
+      PERICIAS_COMPLEMENTARES[2];
+    const compLimpo = novoComplemento.trim();
+
     const nova: PericiaItem = {
       id: gerarId(),
-      nome: novoNome.trim(),
-      atributoChave: novoAtrib,
+      nome: montarNomeComComplemento(cfg.nomeBase, compLimpo),
+      atributoChave: cfg.atributoChave,
+      somenteTreinada: cfg.somenteTreinada,
       treinada: true,
       outrosBonus: 0,
+      complemento: compLimpo,
     };
-    onChange({ ...ficha, pericias: [...ficha.pericias, nova] });
-    setNovoNome('Ofício ()');
+
+    // Insere logo abaixo da última perícia do mesmo tipo (Atuação, Conhecimento ou Ofício)
+    let ultimoIndiceMesmoTipo = -1;
+    ficha.pericias.forEach((p, idx) => {
+      const pCfg = obterConfigComplementar(p);
+      if (pCfg?.nomeBase === cfg.nomeBase) {
+        ultimoIndiceMesmoTipo = idx;
+      }
+    });
+
+    const novaLista = [...ficha.pericias];
+    if (ultimoIndiceMesmoTipo >= 0) {
+      novaLista.splice(ultimoIndiceMesmoTipo + 1, 0, nova);
+    } else {
+      novaLista.push(nova);
+    }
+
+    onChange({ ...ficha, pericias: novaLista });
+    setNovoComplemento('');
     setModalVisivel(false);
   };
+
+  const removerPericiaComplementar = (periciaId: string) => {
+    const novaLista = ficha.pericias.filter((p) => p.id !== periciaId);
+    onChange({ ...ficha, pericias: novaLista });
+  };
+
+  const contarPorTipo = (nomeBase: TipoPericiaComplementar): number => {
+    return ficha.pericias.filter(
+      (p) => obterConfigComplementar(p)?.nomeBase === nomeBase
+    ).length;
+  };
+
+  const configAtualModal =
+    PERICIAS_COMPLEMENTARES.find((c) => c.nomeBase === tipoSelecionado) ||
+    PERICIAS_COMPLEMENTARES[2];
 
   return (
     <View style={styles.container}>
@@ -69,8 +186,8 @@ export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
           <SecaoHeader
             titulo="3. Perícias"
             subtitulo="Total = Graduação + Mod. Habilidade + Outros Bônus"
-            acaoTexto="Ofício/Conhec."
-            onAcaoPress={() => setModalVisivel(true)}
+            acaoTexto="Nova Especialização"
+            onAcaoPress={() => abrirModalParaTipo('Ofício')}
           />
 
           <View style={styles.tableHeader}>
@@ -86,6 +203,10 @@ export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
             const grad = calcularGraduacaoPericia(ficha, pericia);
             const mod = obterModAtributo(ficha, pericia.atributoChave);
             const total = calcularTotalPericia(ficha, pericia);
+            const cfgComp = obterConfigComplementar(pericia);
+            const complementoAtual = cfgComp ? extrairComplemento(pericia) : '';
+            const podeRemover =
+              cfgComp !== undefined && contarPorTipo(cfgComp.nomeBase) > 1;
 
             return (
               <View key={pericia.id} style={styles.rowPericia}>
@@ -103,21 +224,58 @@ export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.colNome}
-                  onPress={() => alternarTreinada(pericia.id)}
-                >
-                  <Text
-                    style={[
-                      styles.periciaNome,
-                      pericia.treinada && styles.periciaNomeTreinada,
-                    ]}
-                  >
-                    {pericia.nome}
-                    {pericia.somenteTreinada ? '*' : ''}
-                  </Text>
-                  <Text style={styles.periciaAtrib}>{pericia.atributoChave}</Text>
-                </TouchableOpacity>
+                <View style={styles.colNome}>
+                  <View style={styles.nomeTopRow}>
+                    <TouchableOpacity
+                      style={styles.nomeTouchArea}
+                      onPress={() => alternarTreinada(pericia.id)}
+                    >
+                      <Text
+                        style={[
+                          styles.periciaNome,
+                          pericia.treinada && styles.periciaNomeTreinada,
+                        ]}
+                      >
+                        {cfgComp ? cfgComp.nomeBase : pericia.nome}
+                        {pericia.somenteTreinada ? '*' : ''}
+                      </Text>
+                      <Text style={styles.periciaAtrib}>
+                        ({pericia.atributoChave})
+                      </Text>
+                    </TouchableOpacity>
+
+                    {cfgComp && (
+                      <View style={styles.acoesComplementoRow}>
+                        <TouchableOpacity
+                          style={styles.btnAddInline}
+                          onPress={() => abrirModalParaTipo(cfgComp.nomeBase)}
+                        >
+                          <Text style={styles.btnAddInlineText}>+ Nova</Text>
+                        </TouchableOpacity>
+                        {podeRemover && (
+                          <TouchableOpacity
+                            style={styles.btnRemInline}
+                            onPress={() => removerPericiaComplementar(pericia.id)}
+                          >
+                            <Text style={styles.btnRemInlineText}>✕</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )}
+                  </View>
+
+                  {cfgComp && (
+                    <TextInput
+                      style={styles.inputComplemento}
+                      value={complementoAtual}
+                      onChangeText={(txt) =>
+                        alterarComplemento(pericia.id, cfgComp.nomeBase, txt)
+                      }
+                      placeholder={cfgComp.placeholder}
+                      placeholderTextColor="#9D8E80"
+                    />
+                  )}
+                </View>
 
                 <Text style={[styles.cellText, styles.colNum]}>+{grad}</Text>
 
@@ -164,34 +322,37 @@ export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
       >
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Nova Especialização de Perícia</Text>
-            <CampoTexto
-              label="Nome (ex: Conhecimento (Arcano), Ofício (Alquimia))"
-              value={novoNome}
-              onChangeText={setNovoNome}
-            />
-            <Text style={styles.modalSubLabel}>Atributo Chave:</Text>
+            <Text style={styles.modalTitle}>Incluir Nova Perícia</Text>
+            <Text style={styles.modalSubLabel}>Escolha a perícia:</Text>
             <View style={styles.chipsRow}>
-              {ATRIBUTOS_LISTA.map((a) => (
-                <TouchableOpacity
-                  key={a.sigla}
-                  style={[
-                    styles.chip,
-                    novoAtrib === a.sigla && styles.chipSelected,
-                  ]}
-                  onPress={() => setNovoAtrib(a.sigla)}
-                >
-                  <Text
-                    style={[
-                      styles.chipText,
-                      novoAtrib === a.sigla && styles.chipTextSelected,
-                    ]}
+              {PERICIAS_COMPLEMENTARES.map((cfg) => {
+                const selecionado = tipoSelecionado === cfg.nomeBase;
+                return (
+                  <TouchableOpacity
+                    key={cfg.nomeBase}
+                    style={[styles.chip, selecionado && styles.chipSelected]}
+                    onPress={() => setTipoSelecionado(cfg.nomeBase)}
                   >
-                    {a.sigla}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      style={[
+                        styles.chipText,
+                        selecionado && styles.chipTextSelected,
+                      ]}
+                    >
+                      {cfg.nomeBase} ({cfg.atributoChave})
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
+
+            <CampoTexto
+              label={`Complemento de ${tipoSelecionado}`}
+              value={novoComplemento}
+              onChangeText={setNovoComplemento}
+              placeholder={configAtualModal.placeholder}
+            />
+
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={styles.btnSecundario}
@@ -201,9 +362,9 @@ export const AbaPericias: React.FC<Props> = ({ ficha, onChange }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.btnPrimario}
-                onPress={adicionarPericiaExtra}
+                onPress={adicionarPericiaComplementar}
               >
-                <Text style={styles.btnPrimarioText}>Adicionar</Text>
+                <Text style={styles.btnPrimarioText}>Incluir</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -253,25 +414,77 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.surfaceVariant,
   },
   colCheck: {
-    width: 40,
+    width: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   colNome: {
     flex: 1,
     paddingHorizontal: 4,
-    textAlign: 'left',
+  },
+  nomeTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  nomeTouchArea: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+    flexShrink: 1,
+  },
+  acoesComplementoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  btnAddInline: {
+    backgroundColor: COLORS.surfaceVariant,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  btnAddInlineText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  btnRemInline: {
+    backgroundColor: 'rgba(179,38,30,0.12)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  btnRemInlineText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.danger,
+  },
+  inputComplemento: {
+    marginTop: 4,
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    fontSize: 12,
+    color: COLORS.text,
   },
   colNum: {
-    width: 38,
+    width: 36,
     textAlign: 'center',
   },
   colOutros: {
-    width: 60,
+    width: 58,
     paddingHorizontal: 2,
   },
   colTotal: {
-    width: 48,
+    width: 46,
     textAlign: 'center',
   },
   checkbox: {
@@ -309,7 +522,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   totalBadge: {
-    width: 46,
+    width: 44,
     marginLeft: 4,
     paddingVertical: 6,
     borderRadius: 6,
@@ -343,25 +556,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.primary,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   modalSubLabel: {
     fontSize: 12,
     fontWeight: '600',
     color: COLORS.textSecondary,
-    marginTop: 8,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 16,
+    gap: 8,
+    marginBottom: 14,
   },
   chip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.surfaceVariant,
@@ -382,6 +594,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 10,
+    marginTop: 12,
   },
   btnSecundario: {
     paddingHorizontal: 14,
@@ -402,4 +615,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-

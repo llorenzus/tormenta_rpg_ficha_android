@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   BackHandler,
   Platform,
   SafeAreaView,
@@ -10,14 +11,18 @@ import {
 import { criarNovaFichaPadrao, FichaPersonagem } from './src/models/ficha';
 import { FichaDetalheScreen } from './src/screens/FichaDetalheScreen';
 import { ListaFichasScreen } from './src/screens/ListaFichasScreen';
+import { TelaInicialScreen } from './src/screens/TelaInicialScreen';
 import {
   carregarFichasLocais,
   excluirFichaLocal,
+  exportarFichaArquivoTxt,
+  importarFichaArquivoTxt,
   salvarFichaLocal,
 } from './src/storage/fichaStorage';
 import { COLORS } from './src/theme/colors';
 
 export default function App() {
+  const [iniciado, setIniciado] = useState(false);
   const [fichas, setFichas] = useState<FichaPersonagem[]>([]);
   const [fichaAberta, setFichaAberta] = useState<FichaPersonagem | null>(null);
 
@@ -31,10 +36,14 @@ export default function App() {
         setFichaAberta(null);
         return true;
       }
+      if (iniciado) {
+        setIniciado(false);
+        return true;
+      }
       return false;
     });
     return () => sub.remove();
-  }, [fichaAberta]);
+  }, [fichaAberta, iniciado]);
 
   const handleCriarNova = async () => {
     const nova = criarNovaFichaPadrao();
@@ -63,21 +72,61 @@ export default function App() {
     }
   };
 
+  const handleExportarFicha = async (ficha: FichaPersonagem) => {
+    try {
+      await exportarFichaArquivoTxt(ficha);
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Exportar',
+        e?.message || 'Não foi possível exportar o arquivo da ficha.'
+      );
+    }
+  };
+
+  const handleImportarFicha = async () => {
+    try {
+      const resultado = await importarFichaArquivoTxt();
+      if (!resultado) return;
+      setFichas(resultado.lista);
+      Alert.alert(
+        'Ficha Importada!',
+        `A ficha de "${resultado.fichaImportada.nomePersonagem}" foi importada com sucesso!`,
+        [
+          { text: 'Ficar na Lista', style: 'cancel' },
+          {
+            text: 'Abrir Ficha',
+            onPress: () => setFichaAberta(resultado.fichaImportada),
+          },
+        ]
+      );
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Importar',
+        'O arquivo selecionado não é uma ficha válida do Tormenta RPG.'
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={COLORS.primaryDark} barStyle="light-content" />
+      <StatusBar barStyle="light-content" />
       <View style={styles.container}>
-        {fichaAberta ? (
+        {!iniciado ? (
+          <TelaInicialScreen onIniciar={() => setIniciado(true)} />
+        ) : fichaAberta ? (
           <FichaDetalheScreen
             ficha={fichaAberta}
             onChange={handleAtualizarFicha}
             onSalvarManual={handleSalvarManual}
+            onExportar={() => handleExportarFicha(fichaAberta)}
             onVoltar={() => setFichaAberta(null)}
           />
         ) : (
           <ListaFichasScreen
             fichas={fichas}
             onCriarNova={handleCriarNova}
+            onImportarFicha={handleImportarFicha}
+            onExportarFicha={handleExportarFicha}
             onAbrirFicha={(f) => setFichaAberta(f)}
             onExcluirFicha={handleExcluirFicha}
           />
@@ -98,4 +147,3 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
 });
-
