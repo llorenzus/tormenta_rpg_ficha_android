@@ -1,4 +1,4 @@
-﻿$t = Get-Content -Path "src/data/talentos/talentos.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+$t = Get-Content -Path "src/data/talentos/talentos.json" -Raw -Encoding UTF8 | ConvertFrom-Json
 $m = Get-Content -Path "src/data/magias/magias.json" -Raw -Encoding UTF8 | ConvertFrom-Json
 
 $testTalentos = @(
@@ -43,3 +43,4 @@ foreach ($nome in $testMagias) {
     Write-Host "Já existe magia: $nome (id: $($match.id))"
   }
 }
+

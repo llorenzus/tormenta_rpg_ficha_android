@@ -1,4 +1,4 @@
-﻿$path = "src/data/talentos/talentos.json"
+$path = "src/data/talentos/talentos.json"
 $talentos = Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json
 
 $validCategories = @('Combate', 'Perícia', 'Magia', 'Destino', 'Poderes Concedidos', 'Tormenta')

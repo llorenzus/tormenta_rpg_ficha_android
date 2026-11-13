@@ -1,4 +1,4 @@
-﻿# Script para adicionar os novos talentos de:
+# Script para adicionar os novos talentos de:
 # - Guerras Táuricas
 # - Reinos de Moreania
 # - Manual do Combate
@@ -799,3 +799,4 @@ $listaOrdenada = $listaFinal | Sort-Object -Property nome
 $jsonOutput = $listaOrdenada | ConvertTo-Json -Depth 5
 [System.IO.File]::WriteAllText($talentosPath, $jsonOutput, [System.Text.UTF8Encoding]::new($false))
 Write-Host "Arquivo $talentosPath atualizado com sucesso!"
+

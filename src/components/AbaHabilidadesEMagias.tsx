@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -7,13 +7,23 @@ import {
   View,
 } from 'react-native';
 import {
+  converterMagiaParaItem,
+  converterTalentoParaItem,
+  formatarDescricaoMagia,
+  formatarDescricaoTalento,
+  MagiaData,
+  TalentoData,
+} from '../data';
+import {
   FichaPersonagem,
   gerarId,
   HabilidadeOuTalento,
   MagiaItem,
 } from '../models/ficha';
 import { COLORS } from '../theme/colors';
+import { CampoComSugestoes } from './CampoComSugestoes';
 import { CampoTexto, SecaoHeader } from './CommonInput';
+import { CompendioModal } from './CompendioModal';
 
 interface Props {
   ficha: FichaPersonagem;
@@ -23,6 +33,24 @@ interface Props {
 const NIVEIS_MAGIA = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
+  // Controle do Compêndio Modal
+  const [compendioVisivel, setCompendioVisivel] = useState(false);
+  const [compendioAba, setCompendioAba] = useState<'talentos' | 'magias'>('talentos');
+  const [compendioNivelFiltro, setCompendioNivelFiltro] = useState<number | null>(null);
+
+  const abrirCompendioTalentos = () => {
+    setCompendioAba('talentos');
+    setCompendioNivelFiltro(null);
+    setCompendioVisivel(true);
+  };
+
+  const abrirCompendioMagias = (nivel?: number | null) => {
+    setCompendioAba('magias');
+    setCompendioNivelFiltro(nivel !== undefined ? nivel : null);
+    setCompendioVisivel(true);
+  };
+
+  // Funções de manipulação de itens da ficha
   const adicionarItem = (
     campo: 'habilidadesRaca' | 'habilidadesClasse' | 'talentos'
   ) => {
@@ -83,6 +111,52 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
     });
   };
 
+  // Callback ao adicionar talento vindo do Compêndio
+  const handleAdicionarTalentoCompendio = (talento: TalentoData) => {
+    const novo = converterTalentoParaItem(talento);
+    onChange({
+      ...ficha,
+      talentos: [...ficha.talentos, novo],
+    });
+  };
+
+  // Callback ao adicionar magia vinda do Compêndio
+  const handleAdicionarMagiaCompendio = (magia: MagiaData) => {
+    const nova = converterMagiaParaItem(magia);
+    onChange({
+      ...ficha,
+      magias: [...ficha.magias, nova],
+    });
+  };
+
+  // Callback de preenchimento automático em um item específico de talento
+  const handlePreencherTalentoExistente = (
+    itemAntigo: HabilidadeOuTalento,
+    talento: TalentoData
+  ) => {
+    const atualizado: HabilidadeOuTalento = {
+      ...itemAntigo,
+      nome: talento.nome,
+      descricao: formatarDescricaoTalento(talento),
+    };
+    atualizarItem('talentos', atualizado);
+  };
+
+  // Callback de preenchimento automático em um item específico de magia
+  const handlePreencherMagiaExistente = (
+    magiaAntiga: MagiaItem,
+    magia: MagiaData
+  ) => {
+    const atualizada: MagiaItem = {
+      ...magiaAntiga,
+      nome: magia.nome,
+      nivelCirculo: magia.nivel,
+      custoPm: magia.nivel === 0 ? '0' : String(magia.nivel),
+      descricao: formatarDescricaoMagia(magia),
+    };
+    atualizarMagia(atualizada);
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -90,7 +164,7 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
       keyboardShouldPersistTaps="handled"
     >
       {/* 1. HABILIDADES DE RAÇA */}
-      <BlocoHabilidades
+      <BlocoHabilidadesSimples
         titulo="Habilidades de Raça"
         subtitulo="Traços e habilidades raciais do personagem"
         placeholderNome="Nome da Habilidade Racial"
@@ -101,7 +175,7 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
       />
 
       {/* 2. HABILIDADES DE CLASSE */}
-      <BlocoHabilidades
+      <BlocoHabilidadesSimples
         titulo="Habilidades de Classe"
         subtitulo="Poderes e características de classe"
         placeholderNome="Nome da Habilidade de Classe"
@@ -111,23 +185,93 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
         onRemover={(id) => removerItem('habilidadesClasse', id)}
       />
 
-      {/* 3. TALENTOS */}
-      <BlocoHabilidades
-        titulo="Talentos"
-        subtitulo="Talentos gerais, de combate, destino, magia ou tormenta"
-        placeholderNome="Nome do Talento"
-        itens={ficha.talentos}
-        onAdicionar={() => adicionarItem('talentos')}
-        onAtualizar={(item) => atualizarItem('talentos', item)}
-        onRemover={(id) => removerItem('talentos', id)}
-      />
-
-      {/* 4. MAGIAS DIVIDIDAS POR NÍVEL DE MAGIA */}
+      {/* 3. TALENTOS COM AUTOCOMPLETE E COMPÊNDIO */}
       <View style={styles.card}>
-        <SecaoHeader
-          titulo="Magias por Nível"
-          subtitulo="Dividido com espaço para cada nível de magia (0º ao 9º)"
-        />
+        <View style={styles.cardHeaderWithAction}>
+          <View style={styles.cardHeaderTitleCol}>
+            <Text style={styles.cardHeaderTitle}>Talentos</Text>
+            <Text style={styles.cardHeaderSubtitle}>
+              Gerais, Combate, Perícia, Destino, Magia, Poderes ou Tormenta
+            </Text>
+          </View>
+          <View style={styles.headerButtonsRow}>
+            <TouchableOpacity
+              style={styles.btnCompendio}
+              onPress={abrirCompendioTalentos}
+            >
+              <Text style={styles.btnCompendioText}>📖 Compêndio</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnAdicionarHeader}
+              onPress={() => adicionarItem('talentos')}
+            >
+              <Text style={styles.btnAdicionarHeaderText}>+ Manual</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.cardBody}>
+          {ficha.talentos.length === 0 ? (
+            <View style={styles.emptyWrap}>
+              <Text style={styles.emptyText}>
+                Nenhum talento cadastrado. Toque em "📖 Compêndio" para escolher da lista ou "+ Manual" para criar.
+              </Text>
+            </View>
+          ) : (
+            ficha.talentos.map((item) => (
+              <View key={item.id} style={styles.itemSubCard}>
+                <View style={styles.rowTop}>
+                  <View style={styles.colFlex}>
+                    <CampoComSugestoes
+                      label="Nome do Talento"
+                      value={item.nome}
+                      onChangeText={(v) => atualizarItem('talentos', { ...item, nome: v })}
+                      tipo="talento"
+                      placeholder="Ex: Ataque Poderoso, Foco em Arma..."
+                      onSelecionarSugestao={(t) =>
+                        handlePreencherTalentoExistente(item, t as TalentoData)
+                      }
+                      onAbrirCompendio={abrirCompendioTalentos}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    style={styles.btnRemove}
+                    onPress={() => removerItem('talentos', item.id)}
+                  >
+                    <Text style={styles.btnRemoveText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+                <CampoTexto
+                  label="Descrição / Pré-requisitos / Benefício"
+                  value={item.descricao}
+                  onChangeText={(v) =>
+                    atualizarItem('talentos', { ...item, descricao: v })
+                  }
+                  multiline
+                />
+              </View>
+            ))
+          )}
+        </View>
+      </View>
+
+      {/* 4. MAGIAS DIVIDIDAS POR NÍVEL COM COMPÊNDIO */}
+      <View style={styles.card}>
+        <View style={styles.cardHeaderWithAction}>
+          <View style={styles.cardHeaderTitleCol}>
+            <Text style={styles.cardHeaderTitle}>Magias por Nível</Text>
+            <Text style={styles.cardHeaderSubtitle}>
+              Grimório dividido do 0º ao 9º nível com consulta e preenchimento
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.btnCompendio}
+            onPress={() => abrirCompendioMagias(null)}
+          >
+            <Text style={styles.btnCompendioText}>📖 Grimório Geral</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.cardBody}>
           {NIVEIS_MAGIA.map((nivel) => {
             const magiasNivel = ficha.magias.filter(
@@ -141,30 +285,56 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
                       ? 'Nível 0 (Truques / Preces)'
                       : `${nivel}º Nível de Magia`}
                   </Text>
-                  <TouchableOpacity
-                    style={styles.btnAddMagia}
-                    onPress={() => adicionarMagia(nivel)}
-                  >
-                    <Text style={styles.btnAddMagiaText}>+ Magia</Text>
-                  </TouchableOpacity>
+                  <View style={styles.nivelMagiaActions}>
+                    <TouchableOpacity
+                      style={styles.btnBuscarNivel}
+                      onPress={() => abrirCompendioMagias(nivel)}
+                    >
+                      <Text style={styles.btnBuscarNivelText}>📖 Buscar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.btnAddMagia}
+                      onPress={() => adicionarMagia(nivel)}
+                    >
+                      <Text style={styles.btnAddMagiaText}>+ Manual</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 {magiasNivel.length === 0 ? (
                   <Text style={styles.emptyText}>
-                    Espaço livre — nenhuma magia de {nivel}º nível cadastrada.
+                    Espaço livre — toque em "📖 Buscar" ou "+ Manual" para adicionar.
                   </Text>
                 ) : (
                   magiasNivel.map((magia) => (
                     <View key={magia.id} style={styles.itemSubCard}>
                       <View style={styles.rowTop}>
-                        <CampoTexto
-                          label="Nome da Magia"
-                          value={magia.nome}
-                          onChangeText={(v) =>
-                            atualizarMagia({ ...magia, nome: v })
-                          }
-                          style={styles.colFlex}
-                        />
+                        <View style={styles.colNomeMagia}>
+                          <CampoComSugestoes
+                            label="Nome da Magia"
+                            value={magia.nome}
+                            onChangeText={(v) =>
+                              atualizarMagia({ ...magia, nome: v })
+                            }
+                            tipo="magia"
+                            nivelMagia={nivel}
+                            placeholder="Ex: Bola de Fogo, Curar Ferimentos..."
+                            onSelecionarSugestao={(m) =>
+                              handlePreencherMagiaExistente(magia, m as MagiaData)
+                            }
+                            onAbrirCompendio={() => abrirCompendioMagias(nivel)}
+                          />
+                        </View>
+                        <View style={styles.colPmMagia}>
+                          <CampoTexto
+                            label="Custo PM"
+                            value={magia.custoPm}
+                            onChangeText={(v) =>
+                              atualizarMagia({ ...magia, custoPm: v })
+                            }
+                            keyboardType="numeric"
+                          />
+                        </View>
                         <TouchableOpacity
                           style={styles.btnRemove}
                           onPress={() => removerMagia(magia.id)}
@@ -188,11 +358,22 @@ export const AbaHabilidadesEMagias: React.FC<Props> = ({ ficha, onChange }) => {
           })}
         </View>
       </View>
+
+      {/* Modal do Compêndio */}
+      <CompendioModal
+        visivel={compendioVisivel}
+        onFechar={() => setCompendioVisivel(false)}
+        abaInicial={compendioAba}
+        nivelFiltroInicial={compendioNivelFiltro}
+        fichaAtual={ficha}
+        onAdicionarTalentoAFicha={handleAdicionarTalentoCompendio}
+        onAdicionarMagiaAFicha={handleAdicionarMagiaCompendio}
+      />
     </ScrollView>
   );
 };
 
-interface BlocoHabilidadesProps {
+interface BlocoHabilidadesSimplesProps {
   titulo: string;
   subtitulo: string;
   placeholderNome: string;
@@ -202,7 +383,7 @@ interface BlocoHabilidadesProps {
   onRemover: (id: string) => void;
 }
 
-const BlocoHabilidades: React.FC<BlocoHabilidadesProps> = ({
+const BlocoHabilidadesSimples: React.FC<BlocoHabilidadesSimplesProps> = ({
   titulo,
   subtitulo,
   placeholderNome,
@@ -272,8 +453,63 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     overflow: 'hidden',
   },
+  cardHeaderWithAction: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: COLORS.surfaceVariant,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  cardHeaderTitleCol: {
+    flex: 1,
+    minWidth: 180,
+  },
+  cardHeaderTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  cardHeaderSubtitle: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  headerButtonsRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  btnCompendio: {
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  btnCompendioText: {
+    color: '#3B2900',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  btnAdicionarHeader: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  btnAdicionarHeaderText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
   cardBody: {
     padding: 12,
+  },
+  emptyWrap: {
+    paddingVertical: 12,
   },
   emptyText: {
     fontSize: 12,
@@ -288,23 +524,23 @@ const styles = StyleSheet.create({
   },
   rowTop: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
   },
   colFlex: {
     flex: 1,
   },
   colNomeMagia: {
-    flex: 1.6,
+    flex: 1.5,
   },
   colPmMagia: {
-    flex: 0.6,
+    width: 75,
   },
   btnRemove: {
-    marginTop: 14,
+    marginTop: 24,
     width: 34,
-    height: 34,
-    borderRadius: 8,
+    height: 38,
+    borderRadius: 6,
     backgroundColor: 'rgba(179,38,30,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -325,22 +561,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 6,
+    flexWrap: 'wrap',
+    gap: 6,
   },
   nivelMagiaTitulo: {
     fontSize: 14,
     fontWeight: 'bold',
     color: COLORS.primary,
   },
+  nivelMagiaActions: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  btnBuscarNivel: {
+    backgroundColor: 'rgba(200,157,60,0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+  },
+  btnBuscarNivelText: {
+    color: '#8A6414',
+    fontWeight: 'bold',
+    fontSize: 11,
+  },
   btnAddMagia: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 6,
   },
   btnAddMagiaText: {
     color: COLORS.white,
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 11,
   },
 });
-

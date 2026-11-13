@@ -8,3 +8,4 @@ $m | Where-Object { $_.id -in @('chamas_de_tauron', 'chamas_de_tauron_maior', 's
     Write-Host "Desc: $($_.descricao.Substring(0, [Math]::Min(80, $_.descricao.Length)))..."
     Write-Host "--------------------"
 }
+
