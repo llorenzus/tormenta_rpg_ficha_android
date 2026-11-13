@@ -1,6 +1,8 @@
 # Fichas Tormenta RPG (React Native + Expo Go)
 
-Aplicativo para gerenciamento local de fichas de personagem do sistema **Tormenta RPG**, desenvolvido em **React Native + Expo (TypeScript)** para rodar diretamente no celular pelo aplicativo **Expo Go**.
+Aplicativo para gerenciamento local de fichas de personagem do sistema **Tormenta RPG**, desenvolvido em **React Native + Expo (TypeScript)** para rodar diretamente no celular (via **APK** ou **Expo Go**).
+
+> **Sobre o Projeto:** Este é um **projeto pessoal** criado para administrar as fichas de RPG das mesas em que jogo. Por esse motivo, nem todas as regras ou cálculos estão estritamente de acordo com o manual oficial, sendo adaptados para a forma pessoal e regras da casa (*homebrew*) com que jogamos.
 
 ## Como Rodar no Seu Celular com Expo Go
 
