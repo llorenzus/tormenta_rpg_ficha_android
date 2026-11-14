@@ -64,8 +64,7 @@ export const FichaDetalheScreen: React.FC<Props> = ({
             {ficha.nomePersonagem?.trim() || 'Ficha de Personagem'}
           </Text>
           <Text style={styles.subtitleText} numberOfLines={1}>
-            Nív {ficha.nivel} • PV {ficha.pvAtual}/{ficha.pvTotal} • PM{' '}
-            {ficha.pmAtual}/{ficha.pmTotal} • CA {caTotal}
+            PV {ficha.pvAtual}/{ficha.pvTotal} • PM {ficha.pmAtual}/{ficha.pmTotal} • CA {caTotal}
           </Text>
         </View>
 
