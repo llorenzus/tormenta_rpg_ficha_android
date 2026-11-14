@@ -444,6 +444,9 @@ const styles = StyleSheet.create({
   content: {
     padding: 12,
     paddingBottom: 36,
+    maxWidth: 960,
+    width: '100%',
+    alignSelf: 'center',
   },
   card: {
     backgroundColor: COLORS.surface,

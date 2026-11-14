@@ -66,30 +66,32 @@ export const FichaDetalheScreen: React.FC<Props> = ({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Top Bar */}
-      <View style={styles.topBar}>
-        <TouchableOpacity style={styles.backBtn} onPress={onVoltar}>
-          <Text style={styles.backBtnText}>← Fichas</Text>
-        </TouchableOpacity>
-
-        <View style={styles.titleCol}>
-          <Text style={styles.titleText} numberOfLines={1}>
-            {ficha.nomePersonagem?.trim() || 'Ficha de Personagem'}
-          </Text>
-          <Text style={styles.subtitleText} numberOfLines={1}>
-            {isDesktop
-              ? subtituloDesktop || 'Tormenta RPG'
-              : `PV ${ficha.pvAtual}/${ficha.pvTotal} • PM ${ficha.pmAtual}/${ficha.pmTotal} • CA ${caTotal}`}
-          </Text>
-        </View>
-
-        <View style={styles.topRightActions}>
-          <TouchableOpacity style={styles.exportBtn} onPress={onExportar}>
-            <Text style={styles.exportBtnText}>Exportar</Text>
+      {/* Top Bar Responsiva */}
+      <View style={[styles.topBar, isDesktop ? styles.topBarDesktop : styles.topBarMobile]}>
+        <View style={[styles.topBarContent, isDesktop && styles.desktopMaxWidth]}>
+          <TouchableOpacity style={styles.backBtn} onPress={onVoltar} activeOpacity={0.8}>
+            <Text style={styles.backBtnText}>← Fichas</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.saveBtn} onPress={handleSalvarClick}>
-            <Text style={styles.saveBtnText}>Salvar</Text>
-          </TouchableOpacity>
+
+          <View style={styles.titleCol}>
+            <Text style={styles.titleText} numberOfLines={1}>
+              {ficha.nomePersonagem?.trim() || 'Ficha de Personagem'}
+            </Text>
+            <Text style={styles.subtitleText} numberOfLines={1}>
+              {isDesktop
+                ? subtituloDesktop || 'Tormenta RPG'
+                : `PV ${ficha.pvAtual}/${ficha.pvTotal} • PM ${ficha.pmAtual}/${ficha.pmTotal} • CA ${caTotal}`}
+            </Text>
+          </View>
+
+          <View style={styles.topRightActions}>
+            <TouchableOpacity style={styles.exportBtn} onPress={onExportar} activeOpacity={0.8}>
+              <Text style={styles.exportBtnText}>Exportar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSalvarClick} activeOpacity={0.8}>
+              <Text style={styles.saveBtnText}>Salvar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -154,12 +156,25 @@ const styles = StyleSheet.create({
   },
   topBar: {
     backgroundColor: COLORS.primary,
+  },
+  topBarMobile: {
     paddingHorizontal: 12,
     paddingVertical: 10,
+  },
+  topBarDesktop: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  topBarContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    width: '100%',
     gap: 8,
+  },
+  desktopMaxWidth: {
+    maxWidth: 1300,
+    alignSelf: 'center',
   },
   backBtn: {
     paddingVertical: 6,

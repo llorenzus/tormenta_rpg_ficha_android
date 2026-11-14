@@ -56,28 +56,53 @@ export const ListaFichasScreen: React.FC<Props> = ({
 
   return (
     <View style={styles.container}>
-      {/* Top Bar com container centralizado no Desktop */}
-      <View style={styles.topBar}>
+      {/* Top Bar Responsiva: Perfeita em Mobile e Desktop */}
+      <View style={[styles.topBar, isDesktop ? styles.topBarDesktop : styles.topBarMobile]}>
         <View style={[styles.topBarContent, isDesktop && styles.desktopMaxWidth]}>
           <View style={styles.topBarLeft}>
-            <Text style={styles.topBarTitle}>Tormenta RPG</Text>
-            <Text style={styles.topBarSubtitle}>Gerenciador de Fichas</Text>
+            <Text
+              style={isDesktop ? styles.titleDesktop : styles.titleMobile}
+              numberOfLines={1}
+            >
+              Tormenta RPG
+            </Text>
+            <Text
+              style={isDesktop ? styles.subtitleDesktop : styles.subtitleMobile}
+              numberOfLines={1}
+            >
+              {isDesktop ? 'Gerenciador de Fichas de Personagem' : 'Gerenciador de Fichas'}
+            </Text>
           </View>
-          <View style={styles.topActionsRow}>
+
+          <View style={[styles.topActionsRow, isDesktop ? styles.actionsDesktop : styles.actionsMobile]}>
             <TouchableOpacity
-              style={styles.btnTopCompendio}
+              style={[styles.btnAction, isDesktop ? styles.btnCompendioDesktop : styles.btnCompendioMobile]}
               onPress={onAbrirCompendio}
+              activeOpacity={0.8}
             >
-              <Text style={styles.btnTopCompendioText}>📖 Compêndio</Text>
+              <Text style={[styles.btnText, isDesktop ? styles.btnTextCompendioDesktop : styles.btnTextCompendioMobile]}>
+                {isDesktop ? '📖 Compêndio' : '📖 Regras'}
+              </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={styles.btnTopImportar}
+              style={[styles.btnAction, isDesktop ? styles.btnImportarDesktop : styles.btnImportarMobile]}
               onPress={onImportarFicha}
+              activeOpacity={0.8}
             >
-              <Text style={styles.btnTopImportarText}>Importar</Text>
+              <Text style={[styles.btnText, isDesktop ? styles.btnTextWhiteDesktop : styles.btnTextWhiteMobile]}>
+                {isDesktop ? 'Importar JSON' : 'Importar'}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnTopNova} onPress={onCriarNova}>
-              <Text style={styles.btnTopNovaText}>+ Nova Ficha</Text>
+
+            <TouchableOpacity
+              style={[styles.btnAction, isDesktop ? styles.btnNovaDesktop : styles.btnNovaMobile]}
+              onPress={onCriarNova}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.btnText, isDesktop ? styles.btnTextDarkDesktop : styles.btnTextDarkMobile]}>
+                {isDesktop ? '+ Nova Ficha' : '+ Nova'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -214,14 +239,19 @@ const styles = StyleSheet.create({
   },
   topBar: {
     backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+  },
+  topBarMobile: {
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+  },
+  topBarDesktop: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
   },
   topBarContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
     width: '100%',
   },
   desktopMaxWidth: {
@@ -229,59 +259,111 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   topBarLeft: {
-    flex: 1,
+    flexShrink: 0,
+    marginRight: 6,
   },
-  topBarTitle: {
+  titleMobile: {
     color: COLORS.white,
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: 'bold',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
-  topBarSubtitle: {
+  titleDesktop: {
+    color: COLORS.white,
+    fontSize: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.6,
+  },
+  subtitleMobile: {
+    color: '#FFEAA7',
+    fontSize: 10.5,
+    marginTop: 1,
+  },
+  subtitleDesktop: {
     color: '#FFEAA7',
     fontSize: 12,
+    marginTop: 2,
   },
   topActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    flexShrink: 0,
   },
-  btnTopCompendio: {
+  actionsMobile: {
+    gap: 5,
+  },
+  actionsDesktop: {
+    gap: 10,
+  },
+  btnAction: {
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnCompendioMobile: {
     backgroundColor: 'rgba(200,157,60,0.25)',
     borderWidth: 1,
     borderColor: COLORS.gold,
-    paddingHorizontal: 12,
+    paddingHorizontal: 7,
+    paddingVertical: 6,
+  },
+  btnCompendioDesktop: {
+    backgroundColor: 'rgba(200,157,60,0.25)',
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    paddingHorizontal: 13,
     paddingVertical: 8,
-    borderRadius: 8,
   },
-  btnTopCompendioText: {
-    color: '#FFEAA7',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  btnTopImportar: {
+  btnImportarMobile: {
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
     borderColor: COLORS.gold,
-    paddingHorizontal: 12,
+    paddingHorizontal: 7,
+    paddingVertical: 6,
+  },
+  btnImportarDesktop: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    paddingHorizontal: 13,
     paddingVertical: 8,
-    borderRadius: 8,
   },
-  btnTopImportarText: {
-    color: COLORS.white,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  btnTopNova: {
+  btnNovaMobile: {
     backgroundColor: COLORS.gold,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
   },
-  btnTopNovaText: {
-    color: '#1F1A17',
+  btnNovaDesktop: {
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+  },
+  btnText: {
     fontWeight: 'bold',
+  },
+  btnTextCompendioMobile: {
+    color: '#FFEAA7',
+    fontSize: 11,
+  },
+  btnTextCompendioDesktop: {
+    color: '#FFEAA7',
     fontSize: 13,
+  },
+  btnTextWhiteMobile: {
+    color: COLORS.white,
+    fontSize: 11,
+  },
+  btnTextWhiteDesktop: {
+    color: COLORS.white,
+    fontSize: 13,
+  },
+  btnTextDarkMobile: {
+    color: '#1F1A17',
+    fontSize: 11.5,
+  },
+  btnTextDarkDesktop: {
+    color: '#1F1A17',
+    fontSize: 13.5,
   },
   emptyWrap: {
     flex: 1,
@@ -359,7 +441,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   listContent: {
-    padding: 14,
+    padding: 12,
     paddingBottom: 32,
   },
   listContentDesktop: {

@@ -162,7 +162,8 @@ export const CompendioModal: React.FC<Props> = ({
       presentationStyle="pageSheet"
     >
       <SafeAreaView style={styles.container}>
-        {/* Top Header */}
+        <View style={styles.innerContainer}>
+          {/* Top Header */}
         <View style={styles.header}>
           <View style={styles.headerTitleCol}>
             <Text style={styles.headerTitle}>Compêndio de Regras</Text>
@@ -649,6 +650,7 @@ export const CompendioModal: React.FC<Props> = ({
             </View>
           </Modal>
         )}
+        </View>
       </SafeAreaView>
     </Modal>
   );
@@ -657,6 +659,13 @@ export const CompendioModal: React.FC<Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  innerContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 1100,
+    alignSelf: 'center',
     backgroundColor: COLORS.background,
   },
   header: {
@@ -1011,6 +1020,7 @@ const styles = StyleSheet.create({
   },
   dialogCard: {
     width: '100%',
+    maxWidth: 480,
     maxHeight: '80%',
     backgroundColor: COLORS.surface,
     borderRadius: 12,
