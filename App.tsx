@@ -9,24 +9,32 @@ import {
   View,
 } from 'react-native';
 import { CompendioModal } from './src/components/CompendioModal';
+import { ModalExportarFicha } from './src/components/ModalExportarFicha';
 import {
   converterMagiaParaItem,
   converterTalentoParaItem,
   MagiaData,
   TalentoData,
 } from './src/data';
-import { criarNovaFichaPadrao, FichaPersonagem } from './src/models/ficha';
+import {
+  criarNovaFichaPadrao,
+  existeFichaComMesmoNome,
+  FichaPersonagem,
+  gerarProximoNomePadrao,
+} from './src/models/ficha';
 import { FichaDetalheScreen } from './src/screens/FichaDetalheScreen';
 import { ListaFichasScreen } from './src/screens/ListaFichasScreen';
 import { TelaInicialScreen } from './src/screens/TelaInicialScreen';
 import {
   carregarFichasLocais,
+  compartilharJson,
+  compartilharPdf,
   excluirFichaLocal,
-  exportarFichaArquivoJson,
-  exportarFichaArquivoPdf,
   imprimirFichaDireto,
   importarFichaArquivoJson,
   salvarFichaLocal,
+  salvarJsonNoAparelho,
+  salvarPdfNoAparelho,
 } from './src/storage/fichaStorage';
 import { COLORS } from './src/theme/colors';
 
@@ -35,10 +43,56 @@ export default function App() {
   const [fichas, setFichas] = useState<FichaPersonagem[]>([]);
   const [fichaAberta, setFichaAberta] = useState<FichaPersonagem | null>(null);
   const [compendioGeralAberto, setCompendioGeralAberto] = useState(false);
+  const [fichaParaExportar, setFichaParaExportar] = useState<FichaPersonagem | null>(null);
 
   useEffect(() => {
     carregarFichasLocais().then(setFichas);
   }, []);
+
+  const handleVoltarDaFicha = async () => {
+    if (!fichaAberta) {
+      setFichaAberta(null);
+      return;
+    }
+
+    const nomeTrim = fichaAberta.nomePersonagem?.trim();
+
+    // Se o nome ficou vazio ao sair, gera o próximo nome padrão
+    if (!nomeTrim) {
+      const nomePadrao = gerarProximoNomePadrao(fichas, fichaAberta.id);
+      const fichaSalva = { ...fichaAberta, nomePersonagem: nomePadrao };
+      const listaAtualizada = await salvarFichaLocal(fichaSalva);
+      setFichas(listaAtualizada);
+      setFichaAberta(null);
+      return;
+    }
+
+    // Se o nome colide com outra ficha já salva
+    if (existeFichaComMesmoNome(fichas, nomeTrim, fichaAberta.id)) {
+      Alert.alert(
+        'Nome Já Cadastrado',
+        `O nome "${nomeTrim}" já pertence a outro personagem. Deseja continuar editando ou descartar as alterações?`,
+        [
+          { text: 'Continuar Editando', style: 'cancel' },
+          {
+            text: 'Descartar e Sair',
+            style: 'destructive',
+            onPress: async () => {
+              const lista = await carregarFichasLocais();
+              setFichas(lista);
+              setFichaAberta(null);
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    // Nome válido: salva e fecha a tela
+    const listaAtualizada = await salvarFichaLocal(fichaAberta);
+    setFichas(listaAtualizada);
+    setFichaAberta(null);
+  };
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -46,8 +100,12 @@ export default function App() {
         setCompendioGeralAberto(false);
         return true;
       }
+      if (fichaParaExportar) {
+        setFichaParaExportar(null);
+        return true;
+      }
       if (fichaAberta) {
-        setFichaAberta(null);
+        handleVoltarDaFicha();
         return true;
       }
       if (iniciado) {
@@ -57,25 +115,50 @@ export default function App() {
       return false;
     });
     return () => sub.remove();
-  }, [compendioGeralAberto, fichaAberta, iniciado]);
+  }, [compendioGeralAberto, fichaParaExportar, fichaAberta, iniciado, fichas]);
 
-  const handleCriarNova = async () => {
+  const handleCriarNova = () => {
+    // Cria ficha nova com nome vazio conforme especificação
     const nova = criarNovaFichaPadrao();
-    const listaAtualizada = await salvarFichaLocal(nova);
-    setFichas(listaAtualizada);
     setFichaAberta(nova);
   };
 
   const handleAtualizarFicha = async (editada: FichaPersonagem) => {
     setFichaAberta(editada);
+    // Persistência contínua dos dados
     const listaAtualizada = await salvarFichaLocal(editada);
     setFichas(listaAtualizada);
   };
 
-  const handleSalvarManual = async () => {
-    if (!fichaAberta) return;
-    const listaAtualizada = await salvarFichaLocal(fichaAberta);
+  const handleSalvarManual = async (): Promise<boolean> => {
+    if (!fichaAberta) return false;
+
+    const nomeTrim = fichaAberta.nomePersonagem?.trim();
+
+    // Se o nome não foi alterado (está vazio), atribui 'Novo Personagem', 'Novo Personagem 2'...
+    if (!nomeTrim) {
+      const nomePadrao = gerarProximoNomePadrao(fichas, fichaAberta.id);
+      const fichaComNome = { ...fichaAberta, nomePersonagem: nomePadrao };
+      setFichaAberta(fichaComNome);
+      const listaAtualizada = await salvarFichaLocal(fichaComNome);
+      setFichas(listaAtualizada);
+      return true;
+    }
+
+    // Não permitir salvar personagem com nome já existente em outra ficha
+    if (existeFichaComMesmoNome(fichas, nomeTrim, fichaAberta.id)) {
+      Alert.alert(
+        'Nome Já Cadastrado',
+        `Já existe um personagem salvo com o nome "${nomeTrim}". Por favor, escolha um nome diferente.`
+      );
+      return false;
+    }
+
+    const fichaFinal = { ...fichaAberta, nomePersonagem: nomeTrim };
+    setFichaAberta(fichaFinal);
+    const listaAtualizada = await salvarFichaLocal(fichaFinal);
     setFichas(listaAtualizada);
+    return true;
   };
 
   const handleExcluirFicha = async (id: string) => {
@@ -87,58 +170,84 @@ export default function App() {
   };
 
   const handleExportarFicha = (ficha: FichaPersonagem) => {
-    const nome = ficha.nomePersonagem?.trim() || 'Personagem';
-    Alert.alert(
-      `Exportar: ${nome}`,
-      'Escolha como deseja exportar esta ficha:',
-      [
-        {
-          text: '📄 Compartilhar PDF',
-          onPress: async () => {
-            try {
-              await exportarFichaArquivoPdf(ficha);
-            } catch (e: any) {
-              Alert.alert(
-                'Erro ao Exportar PDF',
-                e?.message || 'Não foi possível gerar o PDF da ficha.'
-              );
-            }
-          },
-        },
-        {
-          text: '🖨️ Imprimir / Salvar PDF (Sistema)',
-          onPress: async () => {
-            try {
-              await imprimirFichaDireto(ficha);
-            } catch (e: any) {
-              Alert.alert(
-                'Erro ao Imprimir',
-                e?.message || 'Não foi possível acionar o serviço de impressão.'
-              );
-            }
-          },
-        },
-        {
-          text: '💾 Arquivo JSON',
-          onPress: async () => {
-            try {
-              await exportarFichaArquivoJson(ficha);
-            } catch (e: any) {
-              Alert.alert(
-                'Erro ao Exportar JSON',
-                e?.message || 'Não foi possível exportar a ficha em JSON.'
-              );
-            }
-          },
-        },
-        { text: 'Cancelar', style: 'cancel' },
-      ]
-    );
+    setFichaParaExportar(ficha);
+  };
+
+  const handleSalvarPdfLocal = async (ficha: FichaPersonagem) => {
+    try {
+      const salvou = await salvarPdfNoAparelho(ficha);
+      if (salvou) {
+        setFichaParaExportar(null);
+        Alert.alert(
+          'PDF Salvo com Sucesso!',
+          `A ficha de "${ficha.nomePersonagem || 'Personagem'}" foi gravada no seu aparelho.`
+        );
+      }
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Salvar PDF',
+        e?.message || 'Não foi possível gravar o arquivo PDF no aparelho.'
+      );
+    }
+  };
+
+  const handleSalvarJsonLocal = async (ficha: FichaPersonagem) => {
+    try {
+      const salvou = await salvarJsonNoAparelho(ficha);
+      if (salvou) {
+        setFichaParaExportar(null);
+        Alert.alert(
+          'JSON Salvo com Sucesso!',
+          `O arquivo JSON de "${ficha.nomePersonagem || 'Personagem'}" foi gravado no seu aparelho.`
+        );
+      }
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Salvar JSON',
+        e?.message || 'Não foi possível gravar o arquivo JSON no aparelho.'
+      );
+    }
+  };
+
+  const handleCompartilharPdf = async (ficha: FichaPersonagem) => {
+    try {
+      setFichaParaExportar(null);
+      await compartilharPdf(ficha);
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Compartilhar PDF',
+        e?.message || 'Não foi possível compartilhar o PDF da ficha.'
+      );
+    }
+  };
+
+  const handleCompartilharJson = async (ficha: FichaPersonagem) => {
+    try {
+      setFichaParaExportar(null);
+      await compartilharJson(ficha);
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Compartilhar JSON',
+        e?.message || 'Não foi possível compartilhar a ficha em JSON.'
+      );
+    }
+  };
+
+  const handleImprimirDireto = async (ficha: FichaPersonagem) => {
+    try {
+      setFichaParaExportar(null);
+      await imprimirFichaDireto(ficha);
+    } catch (e: any) {
+      Alert.alert(
+        'Erro ao Imprimir',
+        e?.message || 'Não foi possível acionar o serviço de impressão.'
+      );
+    }
   };
 
   const handleImportarFicha = async () => {
     try {
-      const resultado = await importarFichaArquivoJson();
+      const resultado = await importarFichaArquivoJson(fichas);
       if (!resultado) return;
       setFichas(resultado.lista);
       Alert.alert(
@@ -154,7 +263,7 @@ export default function App() {
       );
     } catch (e: any) {
       Alert.alert(
-        'Erro ao Importar Ficha',
+        'Importação Não Permitida',
         e?.message || 'O arquivo selecionado não é uma ficha válida do Tormenta RPG em formato JSON.'
       );
     }
@@ -207,7 +316,7 @@ export default function App() {
             onChange={handleAtualizarFicha}
             onSalvarManual={handleSalvarManual}
             onExportar={() => handleExportarFicha(fichaAberta)}
-            onVoltar={() => setFichaAberta(null)}
+            onVoltar={handleVoltarDaFicha}
           />
         ) : (
           <ListaFichasScreen
@@ -227,6 +336,17 @@ export default function App() {
           todasFichas={fichas}
           fichaAtual={fichaAberta}
           onAdicionarItemParaFichaEspecifica={handleAdicionarItemParaFichaEspecifica}
+        />
+
+        <ModalExportarFicha
+          visivel={!!fichaParaExportar}
+          ficha={fichaParaExportar}
+          onFechar={() => setFichaParaExportar(null)}
+          onSalvarPdf={handleSalvarPdfLocal}
+          onSalvarJson={handleSalvarJsonLocal}
+          onCompartilharPdf={handleCompartilharPdf}
+          onCompartilharJson={handleCompartilharJson}
+          onImprimirDireto={handleImprimirDireto}
         />
       </View>
     </SafeAreaView>

@@ -494,3 +494,4 @@ export function gerarHtmlFichaPdf(ficha: FichaPersonagem): string {
     </html>
   `;
 }
+

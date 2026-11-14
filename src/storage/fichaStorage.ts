@@ -3,10 +3,11 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { Share } from 'react-native';
+import { Platform, Share } from 'react-native';
 import {
   FichaPersonagem,
   criarPericiasPadrao,
+  existeFichaComMesmoNome,
   gerarId,
 } from '../models/ficha';
 import { gerarHtmlFichaPdf } from './fichaPdfGenerator';
@@ -107,9 +108,65 @@ export function gerarSlugNome(nome?: string): string {
 }
 
 /**
- * Exporta a ficha em formato JSON estruturado para importação em outro dispositivo.
+ * 1. SALVAR PDF LOCALMENTE NO APARELHO
+ * Solicita ao usuário a pasta onde deseja salvar no Android (SAF) ou compartilha para salvar em arquivos.
  */
-export async function exportarFichaArquivoJson(ficha: FichaPersonagem): Promise<void> {
+export async function salvarPdfNoAparelho(ficha: FichaPersonagem): Promise<boolean> {
+  const html = gerarHtmlFichaPdf(ficha);
+  const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
+  const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}`;
+
+  const resultado = await Print.printToFileAsync({
+    html,
+    base64: true,
+  });
+
+  if (!resultado.base64) {
+    throw new Error('Não foi possível gerar os dados do PDF.');
+  }
+
+  // No Android, usa StorageAccessFramework para o usuário escolher a pasta de destino
+  if (Platform.OS === 'android' && FileSystem.StorageAccessFramework) {
+    const permissao = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    if (!permissao.granted) {
+      return false; // Usuário cancelou a seleção da pasta
+    }
+
+    const safUri = await FileSystem.StorageAccessFramework.createFileAsync(
+      permissao.directoryUri,
+      nomeArquivo,
+      'application/pdf'
+    );
+
+    await FileSystem.writeAsStringAsync(safUri, resultado.base64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    return true;
+  }
+
+  // Fallback (iOS ou SAF indisponível)
+  const diretorio = FileSystem.documentDirectory || FileSystem.cacheDirectory;
+  if (diretorio) {
+    const fileUri = `${diretorio}${nomeArquivo}.pdf`;
+    await FileSystem.writeAsStringAsync(fileUri, resultado.base64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    await Sharing.shareAsync(fileUri, {
+      mimeType: 'application/pdf',
+      dialogTitle: `Salvar PDF - ${ficha.nomePersonagem || 'Personagem'}`,
+      UTI: 'com.adobe.pdf',
+    });
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * 2. SALVAR JSON LOCALMENTE NO APARELHO
+ * Solicita ao usuário a pasta onde deseja salvar no Android (SAF) ou compartilha para salvar em arquivos.
+ */
+export async function salvarJsonNoAparelho(ficha: FichaPersonagem): Promise<boolean> {
   const payload: EnvelopeExportacaoFicha = {
     tipoArquivo: 'TORMENTA_RPG_FICHA',
     versaoApp: '1.1.0',
@@ -118,12 +175,104 @@ export async function exportarFichaArquivoJson(ficha: FichaPersonagem): Promise<
   };
 
   const conteudoJson = JSON.stringify(payload, null, 2);
-  const slug = gerarSlugNome(ficha.nomePersonagem);
-  const nomeArquivo = `ficha_tormenta_${slug}.json`;
+  const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
+  const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}`;
+
+  if (Platform.OS === 'android' && FileSystem.StorageAccessFramework) {
+    const permissao = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    if (!permissao.granted) {
+      return false; // Usuário cancelou
+    }
+
+    const safUri = await FileSystem.StorageAccessFramework.createFileAsync(
+      permissao.directoryUri,
+      nomeArquivo,
+      'application/json'
+    );
+
+    await FileSystem.writeAsStringAsync(safUri, conteudoJson, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+    return true;
+  }
+
+  const diretorio = FileSystem.documentDirectory || FileSystem.cacheDirectory;
+  if (diretorio) {
+    const fileUri = `${diretorio}${nomeArquivo}.json`;
+    await FileSystem.writeAsStringAsync(fileUri, conteudoJson, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+    await Sharing.shareAsync(fileUri, {
+      mimeType: 'application/json',
+      dialogTitle: `Salvar JSON - ${ficha.nomePersonagem || 'Personagem'}`,
+      UTI: 'public.json',
+    });
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * 3. COMPARTILHAR PDF
+ * Gera o arquivo em cache temporário com identificador único (evita erro de file not found em chamadas seguidas)
+ * e abre o menu nativo de compartilhamento do sistema.
+ */
+export async function compartilharPdf(ficha: FichaPersonagem): Promise<void> {
+  const html = gerarHtmlFichaPdf(ficha);
+  const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
+
+  const resultado = await Print.printToFileAsync({
+    html,
+    base64: true,
+  });
+
+  const diretorio = FileSystem.cacheDirectory || FileSystem.documentDirectory;
+  if (!diretorio || !resultado.base64) {
+    throw new Error('Falha ao processar o arquivo PDF temporário.');
+  }
+
+  const randomSuffix = Math.random().toString(36).substring(2, 7);
+  const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}_${randomSuffix}.pdf`;
+  const destinoUri = `${diretorio}${nomeArquivo}`;
+
+  await FileSystem.writeAsStringAsync(destinoUri, resultado.base64, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+
+  const podeCompartilhar = await Sharing.isAvailableAsync();
+  if (podeCompartilhar) {
+    await Sharing.shareAsync(destinoUri, {
+      mimeType: 'application/pdf',
+      dialogTitle: `Compartilhar Ficha (PDF) - ${ficha.nomePersonagem || 'Personagem'}`,
+      UTI: 'com.adobe.pdf',
+    });
+  } else {
+    await Print.printAsync({ html });
+  }
+}
+
+/**
+ * 4. COMPARTILHAR JSON
+ * Gera o arquivo .json temporário com identificador único e abre o menu de compartilhamento.
+ */
+export async function compartilharJson(ficha: FichaPersonagem): Promise<void> {
+  const payload: EnvelopeExportacaoFicha = {
+    tipoArquivo: 'TORMENTA_RPG_FICHA',
+    versaoApp: '1.1.0',
+    exportadoEm: new Date().toISOString(),
+    ficha: normalizarFicha(ficha),
+  };
+
+  const conteudoJson = JSON.stringify(payload, null, 2);
+  const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
   const diretorio = FileSystem.cacheDirectory || FileSystem.documentDirectory;
 
   if (diretorio) {
+    const randomSuffix = Math.random().toString(36).substring(2, 7);
+    const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}_${randomSuffix}.json`;
     const fileUri = `${diretorio}${nomeArquivo}`;
+
     await FileSystem.writeAsStringAsync(fileUri, conteudoJson, {
       encoding: FileSystem.EncodingType.UTF8,
     });
@@ -132,7 +281,7 @@ export async function exportarFichaArquivoJson(ficha: FichaPersonagem): Promise<
     if (podeCompartilhar) {
       await Sharing.shareAsync(fileUri, {
         mimeType: 'application/json',
-        dialogTitle: `Exportar Ficha (JSON) - ${ficha.nomePersonagem || 'Personagem'}`,
+        dialogTitle: `Compartilhar Ficha (JSON) - ${ficha.nomePersonagem || 'Personagem'}`,
         UTI: 'public.json',
       });
       return;
@@ -146,59 +295,23 @@ export async function exportarFichaArquivoJson(ficha: FichaPersonagem): Promise<
 }
 
 /**
- * Exporta a ficha formatada em PDF profissional para compartilhamento ou salvamento local.
- * Utiliza geração com base64 gravado no sandbox do app para evitar rejeições de permissão
- * no FileProvider do Android (ExpoSharing).
- */
-export async function exportarFichaArquivoPdf(ficha: FichaPersonagem): Promise<void> {
-  const html = gerarHtmlFichaPdf(ficha);
-  const slug = gerarSlugNome(ficha.nomePersonagem);
-
-  // Solicita ao expo-print que retorne o conteúdo binário em base64
-  const resultado = await Print.printToFileAsync({
-    html,
-    base64: true,
-  });
-
-  const diretorio = FileSystem.cacheDirectory || FileSystem.documentDirectory;
-  let uriFinal = resultado.uri;
-
-  if (diretorio && resultado.base64) {
-    // Grava diretamente no diretório de cache do app para garantir permissão no FileProvider
-    const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}.pdf`;
-    const destinoUri = `${diretorio}${nomeArquivo}`;
-    await FileSystem.writeAsStringAsync(destinoUri, resultado.base64, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    uriFinal = destinoUri;
-  }
-
-  const podeCompartilhar = await Sharing.isAvailableAsync();
-  if (podeCompartilhar) {
-    await Sharing.shareAsync(uriFinal, {
-      mimeType: 'application/pdf',
-      dialogTitle: `Exportar Ficha (PDF) - ${ficha.nomePersonagem || 'Personagem'}`,
-      UTI: 'com.adobe.pdf',
-    });
-  } else {
-    // Fallback: se sharing não estiver disponível, abre o spooler de impressão nativo
-    await Print.printAsync({ html });
-  }
-}
-
-/**
- * Abre diretamente o serviço nativo de impressão do Android/iOS,
- * permitindo imprimir em impressora conectada ou usar o "Salvar como PDF" do sistema.
+ * 5. IMPRESSÃO DIRETA
+ * Abre o spooler de impressão nativo do sistema operacional.
  */
 export async function imprimirFichaDireto(ficha: FichaPersonagem): Promise<void> {
   const html = gerarHtmlFichaPdf(ficha);
   await Print.printAsync({ html });
 }
 
+// Aliases para retrocompatibilidade
+export const exportarFichaArquivoPdf = compartilharPdf;
+export const exportarFichaArquivoJson = compartilharJson;
+
 /**
- * Importa uma ficha a partir de um arquivo .json selecionado pelo usuário.
+ * 6. IMPORTAR FICHA JSON
+ * Lê o arquivo .json selecionado e valida se não há personagem existente com o mesmo nome.
  */
-export async function importarFichaArquivoJson(): Promise<{
+export async function importarFichaArquivoJson(fichasExistentes: FichaPersonagem[] = []): Promise<{
   lista: FichaPersonagem[];
   fichaImportada: FichaPersonagem;
 } | null> {
@@ -214,7 +327,6 @@ export async function importarFichaArquivoJson(): Promise<{
 
   const arquivo = resultado.assets[0];
 
-  // Validação por extensão se o picker do Android retornar tipo genérico
   if (arquivo.name && !arquivo.name.toLowerCase().endsWith('.json')) {
     throw new Error('Apenas arquivos no formato .json são aceitos para importação de ficha.');
   }
@@ -234,7 +346,6 @@ export async function importarFichaArquivoJson(): Promise<{
     throw new Error('Formato do arquivo de ficha inválido.');
   }
 
-  // Suporte a envelope { tipoArquivo: 'TORMENTA_RPG_FICHA', ficha: {...} } ou ficha direta
   let dadosFicha: any;
   if (parsed.tipoArquivo === 'TORMENTA_RPG_FICHA' && parsed.ficha) {
     dadosFicha = parsed.ficha;
@@ -244,14 +355,23 @@ export async function importarFichaArquivoJson(): Promise<{
     throw new Error('O arquivo JSON não corresponde à estrutura de uma ficha do Tormenta RPG.');
   }
 
+  const nomeCandidato =
+    typeof dadosFicha.nomePersonagem === 'string' && dadosFicha.nomePersonagem.trim()
+      ? dadosFicha.nomePersonagem.trim()
+      : 'Personagem Importado';
+
+  // Validação: não permitir importar personagem com nome já existente
+  if (existeFichaComMesmoNome(fichasExistentes, nomeCandidato)) {
+    throw new Error(
+      `Já existe uma ficha salva com o nome "${nomeCandidato}". Altere o nome na ficha existente ou no arquivo JSON antes de importar.`
+    );
+  }
+
   const fichaImportada: FichaPersonagem = normalizarFicha({
     ...dadosFicha,
     id: gerarId(),
     atualizadoEm: Date.now(),
-    nomePersonagem:
-      typeof dadosFicha.nomePersonagem === 'string' && dadosFicha.nomePersonagem.trim()
-        ? dadosFicha.nomePersonagem.trim()
-        : 'Personagem Importado',
+    nomePersonagem: nomeCandidato,
   });
 
   const lista = await salvarFichaLocal(fichaImportada);

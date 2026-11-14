@@ -19,7 +19,7 @@ import { COLORS } from '../theme/colors';
 interface Props {
   ficha: FichaPersonagem;
   onChange: (nova: FichaPersonagem) => void;
-  onSalvarManual: () => void;
+  onSalvarManual: () => Promise<boolean> | boolean;
   onExportar: () => void;
   onVoltar: () => void;
 }
@@ -41,9 +41,11 @@ export const FichaDetalheScreen: React.FC<Props> = ({
   const [abaAtiva, setAbaAtiva] = useState(0);
   const caTotal = calcularCaTotal(ficha);
 
-  const handleSalvarClick = () => {
-    onSalvarManual();
-    Alert.alert('Ficha Salva', 'Todas as alterações foram salvas no seu aparelho.');
+  const handleSalvarClick = async () => {
+    const sucesso = await onSalvarManual();
+    if (sucesso) {
+      Alert.alert('Ficha Salva', 'Todas as alterações foram salvas no seu aparelho.');
+    }
   };
 
   return (

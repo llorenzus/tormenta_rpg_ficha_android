@@ -255,11 +255,46 @@ export function criarPericiasPadrao(): PericiaItem[] {
   }));
 }
 
+export function existeFichaComMesmoNome(
+  fichas: FichaPersonagem[],
+  nome: string,
+  ignorarId?: string
+): boolean {
+  const normalizado = nome?.trim().toLowerCase();
+  if (!normalizado) return false;
+  return fichas.some(
+    (f) => f.id !== ignorarId && f.nomePersonagem?.trim().toLowerCase() === normalizado
+  );
+}
+
+export function gerarProximoNomePadrao(
+  fichas: FichaPersonagem[],
+  ignorarId?: string
+): string {
+  const base = 'Novo Personagem';
+  const fichasValidas = fichas.filter((f) => f.id !== ignorarId);
+  const nomesExistentes = new Set(
+    fichasValidas
+      .map((f) => f.nomePersonagem?.trim().toLowerCase())
+      .filter(Boolean)
+  );
+
+  if (!nomesExistentes.has(base.toLowerCase())) {
+    return base;
+  }
+
+  let indice = 2;
+  while (nomesExistentes.has(`${base.toLowerCase()} ${indice}`)) {
+    indice++;
+  }
+  return `${base} ${indice}`;
+}
+
 export function criarNovaFichaPadrao(): FichaPersonagem {
   return {
     id: gerarId(),
     atualizadoEm: Date.now(),
-    nomePersonagem: 'Novo Personagem',
+    nomePersonagem: '',
     jogador: '',
     raca: '',
     classe: '',
