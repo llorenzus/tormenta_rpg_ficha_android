@@ -70,6 +70,8 @@ jobs:
 
       - name: Compilar Web e Empacotar Executável Windows (Electron)
         run: npm run build:windows
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publicar Executáveis Windows nos Artifacts
         uses: actions/upload-artifact@v7

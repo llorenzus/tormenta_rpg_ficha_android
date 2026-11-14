@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "export:web": "expo export -p web",
     "electron": "electron electron/main.js",
-    "build:windows": "expo export -p web && electron-builder --win --x64"
+    "build:windows": "expo export -p web && electron-builder --win --x64 --publish never"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",
@@ -36,6 +36,7 @@
   "build": {
     "appId": "com.tormenta.gerenciadorfichas",
     "productName": "TRPG Gerenciador de Fichas",
+    "publish": null,
     "directories": {
       "output": "dist-electron"
     },
