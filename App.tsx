@@ -24,6 +24,7 @@ import {
   excluirFichaLocal,
   exportarFichaArquivoJson,
   exportarFichaArquivoPdf,
+  imprimirFichaDireto,
   importarFichaArquivoJson,
   salvarFichaLocal,
 } from './src/storage/fichaStorage';
@@ -92,7 +93,7 @@ export default function App() {
       'Escolha como deseja exportar esta ficha:',
       [
         {
-          text: '📄 Gerar PDF (Imprimir)',
+          text: '📄 Compartilhar PDF',
           onPress: async () => {
             try {
               await exportarFichaArquivoPdf(ficha);
@@ -105,7 +106,20 @@ export default function App() {
           },
         },
         {
-          text: '💾 Salvar JSON (Compartilhar)',
+          text: '🖨️ Imprimir / Salvar PDF (Sistema)',
+          onPress: async () => {
+            try {
+              await imprimirFichaDireto(ficha);
+            } catch (e: any) {
+              Alert.alert(
+                'Erro ao Imprimir',
+                e?.message || 'Não foi possível acionar o serviço de impressão.'
+              );
+            }
+          },
+        },
+        {
+          text: '💾 Arquivo JSON',
           onPress: async () => {
             try {
               await exportarFichaArquivoJson(ficha);

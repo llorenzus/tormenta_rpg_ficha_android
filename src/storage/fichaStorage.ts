@@ -146,29 +146,31 @@ export async function exportarFichaArquivoJson(ficha: FichaPersonagem): Promise<
 }
 
 /**
- * Exporta a ficha formatada em PDF profissional para impressão ou visualização.
+ * Exporta a ficha formatada em PDF profissional para compartilhamento ou salvamento local.
+ * Utiliza geração com base64 gravado no sandbox do app para evitar rejeições de permissão
+ * no FileProvider do Android (ExpoSharing).
  */
 export async function exportarFichaArquivoPdf(ficha: FichaPersonagem): Promise<void> {
   const html = gerarHtmlFichaPdf(ficha);
   const slug = gerarSlugNome(ficha.nomePersonagem);
 
-  // Gera o PDF a partir do HTML estilizado
-  const { uri } = await Print.printToFileAsync({
+  // Solicita ao expo-print que retorne o conteúdo binário em base64
+  const resultado = await Print.printToFileAsync({
     html,
-    base64: false,
+    base64: true,
   });
 
-  // Copia/move para um nome de arquivo amigável caso haja diretório de cache
-  let uriFinal = uri;
   const diretorio = FileSystem.cacheDirectory || FileSystem.documentDirectory;
-  if (diretorio) {
-    const destinoUri = `${diretorio}ficha_tormenta_${slug}.pdf`;
-    try {
-      await FileSystem.copyAsync({ from: uri, to: destinoUri });
-      uriFinal = destinoUri;
-    } catch {
-      uriFinal = uri;
-    }
+  let uriFinal = resultado.uri;
+
+  if (diretorio && resultado.base64) {
+    // Grava diretamente no diretório de cache do app para garantir permissão no FileProvider
+    const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}.pdf`;
+    const destinoUri = `${diretorio}${nomeArquivo}`;
+    await FileSystem.writeAsStringAsync(destinoUri, resultado.base64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    uriFinal = destinoUri;
   }
 
   const podeCompartilhar = await Sharing.isAvailableAsync();
@@ -179,8 +181,18 @@ export async function exportarFichaArquivoPdf(ficha: FichaPersonagem): Promise<v
       UTI: 'com.adobe.pdf',
     });
   } else {
-    throw new Error('O compartilhamento de arquivos não está disponível neste dispositivo.');
+    // Fallback: se sharing não estiver disponível, abre o spooler de impressão nativo
+    await Print.printAsync({ html });
   }
+}
+
+/**
+ * Abre diretamente o serviço nativo de impressão do Android/iOS,
+ * permitindo imprimir em impressora conectada ou usar o "Salvar como PDF" do sistema.
+ */
+export async function imprimirFichaDireto(ficha: FichaPersonagem): Promise<void> {
+  const html = gerarHtmlFichaPdf(ficha);
+  await Print.printAsync({ html });
 }
 
 /**
