@@ -52,6 +52,8 @@ export interface ArmaItem {
   critico: string;
   distancia: string;
   tipoDano: string;
+  usaDestreza?: boolean;
+  outrosBonus?: number;
 }
 
 export interface ArmaduraEquipamento {
@@ -220,6 +222,17 @@ export function calcularResistencia(
   }
   const modSab = obterModAtributo(ficha, 'SAB');
   return meioNivel + modSab + (Number(ficha.vontadeOutros) || 0);
+}
+
+export function calcularAtaqueArma(ficha: FichaPersonagem, arma: ArmaItem): number {
+  const bba = Number(ficha.bba) || 0;
+  const modAtributo = arma.usaDestreza
+    ? obterModAtributo(ficha, 'DES')
+    : obterModAtributo(ficha, 'FOR');
+  const bonusTamanho = Number(ficha.caBonusTamanho) || 0;
+  const outros = Number(arma.outrosBonus) || 0;
+
+  return bba + modAtributo + bonusTamanho + outros;
 }
 
 export function criarPericiasPadrao(): PericiaItem[] {

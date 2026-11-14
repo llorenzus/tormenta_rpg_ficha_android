@@ -9,12 +9,15 @@ import {
 import {
   ArmaItem,
   ArmaduraEquipamento,
+  calcularAtaqueArma,
   calcularCaTotal,
   FichaPersonagem,
+  formatarModificador,
   gerarId,
   ItemGeral,
   obterBonusArmaduraEquipada,
   obterBonusEscudoEquipado,
+  obterModAtributo,
 } from '../models/ficha';
 import { COLORS } from '../theme/colors';
 import { CampoInteiro, CampoTexto, SecaoHeader } from './CommonInput';
@@ -34,7 +37,11 @@ export const AbaEquipamentos: React.FC<Props> = ({ ficha, onChange }) => {
       critico: '',
       distancia: '',
       tipoDano: '',
+      usaDestreza: false,
+      outrosBonus: 0,
     };
+    const totalInicial = calcularAtaqueArma(ficha, nova);
+    nova.bonusAtaque = formatarModificador(totalInicial);
     onChange({ ...ficha, armas: [...ficha.armas, nova] });
   };
 
@@ -126,72 +133,172 @@ export const AbaEquipamentos: React.FC<Props> = ({ ficha, onChange }) => {
               Nenhuma arma cadastrada. Toque em "+ Nova Arma" para adicionar.
             </Text>
           ) : (
-            ficha.armas.map((arma) => (
-              <View key={arma.id} style={styles.subCard}>
-                <View style={styles.rowTop}>
-                  <CampoTexto
-                    label="Nome da Arma"
-                    value={arma.nome}
-                    onChangeText={(v) => atualizarArma({ ...arma, nome: v })}
-                    placeholder="Ex: Espada Longa"
-                    style={styles.colFlex}
-                  />
+            ficha.armas.map((arma) => {
+              const bba = Number(ficha.bba) || 0;
+              const modAtrib = arma.usaDestreza
+                ? obterModAtributo(ficha, 'DES')
+                : obterModAtributo(ficha, 'FOR');
+              const bonusTam = Number(ficha.caBonusTamanho) || 0;
+              const outros = Number(arma.outrosBonus) || 0;
+              const totalCalculado = bba + modAtrib + bonusTam + outros;
+
+              const alternarAtributo = () => {
+                const novoUsaDes = !arma.usaDestreza;
+                const novoTotal = calcularAtaqueArma(ficha, {
+                  ...arma,
+                  usaDestreza: novoUsaDes,
+                });
+                atualizarArma({
+                  ...arma,
+                  usaDestreza: novoUsaDes,
+                  bonusAtaque: formatarModificador(novoTotal),
+                });
+              };
+
+              const atualizarOutrosBonus = (novoOutros: number) => {
+                const novoTotal = calcularAtaqueArma(ficha, {
+                  ...arma,
+                  outrosBonus: novoOutros,
+                });
+                atualizarArma({
+                  ...arma,
+                  outrosBonus: novoOutros,
+                  bonusAtaque: formatarModificador(novoTotal),
+                });
+              };
+
+              return (
+                <View key={arma.id} style={styles.subCard}>
+                  {/* Linha superior: Nome e Excluir */}
+                  <View style={styles.rowTop}>
+                    <CampoTexto
+                      label="Nome da Arma"
+                      value={arma.nome}
+                      onChangeText={(v) => atualizarArma({ ...arma, nome: v })}
+                      placeholder="Ex: Espada Longa"
+                      style={styles.colFlex}
+                    />
+                    <TouchableOpacity
+                      style={styles.btnRemove}
+                      onPress={() => removerArma(arma.id)}
+                    >
+                      <Text style={styles.btnRemoveText}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Checkbox de Atributo (Força vs Destreza) */}
                   <TouchableOpacity
-                    style={styles.btnRemove}
-                    onPress={() => removerArma(arma.id)}
+                    style={[
+                      styles.checkAtributoWrap,
+                      arma.usaDestreza && styles.checkAtributoWrapActive,
+                    ]}
+                    onPress={alternarAtributo}
+                    activeOpacity={0.75}
                   >
-                    <Text style={styles.btnRemoveText}>✕</Text>
+                    <View
+                      style={[
+                        styles.checkboxBox,
+                        arma.usaDestreza && styles.checkboxBoxActive,
+                      ]}
+                    >
+                      {arma.usaDestreza ? (
+                        <Text style={styles.checkboxCheck}>✓</Text>
+                      ) : null}
+                    </View>
+                    <View style={styles.checkAtributoTextCol}>
+                      <Text style={styles.checkAtributoLabel}>
+                        {arma.usaDestreza
+                          ? 'Usar Destreza (Distância / Acuidade)'
+                          : 'Usar Força (Corpo-a-corpo padrão)'}
+                      </Text>
+                    </View>
+                    <View style={styles.badgeAtribBox}>
+                      <Text style={styles.badgeAtribText}>
+                        {arma.usaDestreza
+                          ? `DES (${formatarModificador(modAtrib)})`
+                          : `FOR (${formatarModificador(modAtrib)})`}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
-                </View>
 
-                <View style={styles.row}>
-                  <CampoTexto
-                    label="Bônus de Ataque"
-                    value={arma.bonusAtaque}
-                    onChangeText={(v) =>
-                      atualizarArma({ ...arma, bonusAtaque: v })
-                    }
-                    placeholder="Ex: +7"
-                    style={styles.col}
-                  />
-                  <CampoTexto
-                    label="Dano"
-                    value={arma.dano}
-                    onChangeText={(v) => atualizarArma({ ...arma, dano: v })}
-                    placeholder="Ex: 1d8+4"
-                    style={styles.col}
-                  />
-                </View>
+                  {/* Resumo do Acerto Calculado (BBA + Mod + Tam + Outros) */}
+                  <View style={styles.acertoResumoCard}>
+                    <View style={styles.acertoResumoHeader}>
+                      <Text style={styles.acertoResumoTitulo}>
+                        Acerto Calculado:
+                      </Text>
+                      <Text style={styles.acertoResumoValor}>
+                        {formatarModificador(totalCalculado)}
+                      </Text>
+                    </View>
+                    <Text style={styles.acertoResumoFormula}>
+                      Mod {arma.usaDestreza ? 'DES' : 'FOR'} ({formatarModificador(modAtrib)}) + BBA ({formatarModificador(bba)})
+                      {bonusTam !== 0 ? ` + Tam (${formatarModificador(bonusTam)})` : ''}
+                      {` + Outros (${formatarModificador(outros)})`}
+                    </Text>
+                  </View>
 
-                <View style={styles.row}>
-                  <CampoTexto
-                    label="Crítico"
-                    value={arma.critico}
-                    onChangeText={(v) => atualizarArma({ ...arma, critico: v })}
-                    placeholder="Ex: 19-20/x2"
-                    style={styles.col}
-                  />
-                  <CampoTexto
-                    label="Distância"
-                    value={arma.distancia}
-                    onChangeText={(v) =>
-                      atualizarArma({ ...arma, distancia: v })
-                    }
-                    placeholder="Ex: — ou 9m"
-                    style={styles.col}
-                  />
-                  <CampoTexto
-                    label="Tipo"
-                    value={arma.tipoDano}
-                    onChangeText={(v) =>
-                      atualizarArma({ ...arma, tipoDano: v })
-                    }
-                    placeholder="Corte"
-                    style={styles.col}
-                  />
+                  {/* Bônus de Ataque, Outros e Dano */}
+                  <View style={styles.row}>
+                    <CampoTexto
+                      label="Bônus de Ataque"
+                      value={arma.bonusAtaque}
+                      onChangeText={(v) =>
+                        atualizarArma({ ...arma, bonusAtaque: v })
+                      }
+                      placeholder={formatarModificador(totalCalculado)}
+                      style={styles.col}
+                    />
+                    <CampoInteiro
+                      label="Outros Bônus"
+                      valor={Number(arma.outrosBonus) || 0}
+                      onValorChange={atualizarOutrosBonus}
+                      min={-99}
+                      max={99}
+                      style={styles.col}
+                    />
+                    <CampoTexto
+                      label="Dano"
+                      value={arma.dano}
+                      onChangeText={(v) => atualizarArma({ ...arma, dano: v })}
+                      placeholder="Ex: 1d8+4"
+                      style={styles.col}
+                    />
+                  </View>
+
+                  {/* Crítico, Distância e Tipo */}
+                  <View style={styles.row}>
+                    <CampoTexto
+                      label="Crítico"
+                      value={arma.critico}
+                      onChangeText={(v) =>
+                        atualizarArma({ ...arma, critico: v })
+                      }
+                      placeholder="Ex: 19-20/x2"
+                      style={styles.col}
+                    />
+                    <CampoTexto
+                      label="Distância"
+                      value={arma.distancia}
+                      onChangeText={(v) =>
+                        atualizarArma({ ...arma, distancia: v })
+                      }
+                      placeholder="Ex: — ou 9m"
+                      style={styles.col}
+                    />
+                    <CampoTexto
+                      label="Tipo"
+                      value={arma.tipoDano}
+                      onChangeText={(v) =>
+                        atualizarArma({ ...arma, tipoDano: v })
+                      }
+                      placeholder="Corte"
+                      style={styles.col}
+                    />
+                  </View>
                 </View>
-              </View>
-            ))
+              );
+            })
           )}
         </View>
       </View>
@@ -532,6 +639,90 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: COLORS.text,
+  },
+  checkAtributoWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  checkAtributoWrapActive: {
+    backgroundColor: '#FFF8E7',
+    borderColor: COLORS.gold,
+  },
+  checkboxBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: COLORS.textSecondary,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  checkboxBoxActive: {
+    borderColor: COLORS.primaryDark,
+    backgroundColor: COLORS.primary,
+  },
+  checkboxCheck: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+  checkAtributoTextCol: {
+    flex: 1,
+  },
+  checkAtributoLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  badgeAtribBox: {
+    backgroundColor: COLORS.surfaceVariant,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  badgeAtribText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  acertoResumoCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    padding: 8,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  acertoResumoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  acertoResumoTitulo: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  acertoResumoValor: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  acertoResumoFormula: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
 });
 

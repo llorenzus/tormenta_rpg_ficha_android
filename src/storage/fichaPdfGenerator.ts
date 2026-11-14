@@ -1,4 +1,5 @@
 import {
+  calcularAtaqueArma,
   calcularCaTotal,
   calcularModificador,
   calcularResistencia,
@@ -26,18 +27,23 @@ export function gerarHtmlFichaPdf(ficha: FichaPersonagem): string {
   const armasHtml =
     ficha.armas && ficha.armas.length > 0
       ? ficha.armas
-          .map(
-            (a) => `
+          .map((a) => {
+            const ataqueExibicao =
+              a.bonusAtaque && a.bonusAtaque.trim()
+                ? a.bonusAtaque
+                : formatarModificador(calcularAtaqueArma(ficha, a));
+            const tagAtrib = a.usaDestreza ? ' <small style="color:#666;">(DES)</small>' : ' <small style="color:#666;">(FOR)</small>';
+            return `
         <tr>
-          <td><strong>${a.nome || '-'}</strong></td>
-          <td style="text-align:center;">${a.bonusAtaque || '+0'}</td>
+          <td><strong>${a.nome || '-'}${tagAtrib}</strong></td>
+          <td style="text-align:center;">${ataqueExibicao}</td>
           <td style="text-align:center;">${a.dano || '-'}</td>
           <td style="text-align:center;">${a.critico || '-'}</td>
           <td style="text-align:center;">${a.distancia || '-'}</td>
           <td style="text-align:center;">${a.tipoDano || '-'}</td>
         </tr>
-      `
-          )
+      `;
+          })
           .join('')
       : `<tr><td colspan="6" style="text-align:center; color:#777;">Nenhuma arma cadastrada</td></tr>`;
 

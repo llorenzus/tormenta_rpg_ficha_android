@@ -48,7 +48,13 @@ export function normalizarFicha(ficha: FichaPersonagem): FichaPersonagem {
     habilidadesClasse: Array.isArray(ficha.habilidadesClasse) ? ficha.habilidadesClasse : [],
     talentos: Array.isArray(ficha.talentos) ? ficha.talentos : [],
     magias: Array.isArray(ficha.magias) ? ficha.magias : [],
-    armas: Array.isArray(ficha.armas) ? ficha.armas : [],
+    armas: Array.isArray(ficha.armas)
+      ? ficha.armas.map((a) => ({
+          ...a,
+          usaDestreza: !!a.usaDestreza,
+          outrosBonus: Number.isFinite(a.outrosBonus) ? Number(a.outrosBonus) : 0,
+        }))
+      : [],
     armaduras: Array.isArray(ficha.armaduras) ? ficha.armaduras : [],
     itensGerais: Array.isArray(ficha.itensGerais) ? ficha.itensGerais : [],
     tibares: ficha.tibares || '',
