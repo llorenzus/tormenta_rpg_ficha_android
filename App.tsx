@@ -18,7 +18,6 @@ import {
 } from './src/data';
 import {
   criarNovaFichaPadrao,
-  existeFichaComMesmoNome,
   FichaPersonagem,
   gerarProximoNomePadrao,
 } from './src/models/ficha';
@@ -63,34 +62,11 @@ export default function App() {
       const fichaSalva = { ...fichaAberta, nomePersonagem: nomePadrao };
       const listaAtualizada = await salvarFichaLocal(fichaSalva);
       setFichas(listaAtualizada);
-      setFichaAberta(null);
-      return;
+    } else {
+      const listaAtualizada = await salvarFichaLocal(fichaAberta);
+      setFichas(listaAtualizada);
     }
 
-    // Se o nome colide com outra ficha já salva
-    if (existeFichaComMesmoNome(fichas, nomeTrim, fichaAberta.id)) {
-      Alert.alert(
-        'Nome Já Cadastrado',
-        `O nome "${nomeTrim}" já pertence a outro personagem. Deseja continuar editando ou descartar as alterações?`,
-        [
-          { text: 'Continuar Editando', style: 'cancel' },
-          {
-            text: 'Descartar e Sair',
-            style: 'destructive',
-            onPress: async () => {
-              const lista = await carregarFichasLocais();
-              setFichas(lista);
-              setFichaAberta(null);
-            },
-          },
-        ]
-      );
-      return;
-    }
-
-    // Nome válido: salva e fecha a tela
-    const listaAtualizada = await salvarFichaLocal(fichaAberta);
-    setFichas(listaAtualizada);
     setFichaAberta(null);
   };
 
@@ -133,28 +109,17 @@ export default function App() {
   const handleSalvarManual = async (): Promise<boolean> => {
     if (!fichaAberta) return false;
 
+    let fichaFinal: FichaPersonagem;
     const nomeTrim = fichaAberta.nomePersonagem?.trim();
 
     // Se o nome não foi alterado (está vazio), atribui 'Novo Personagem', 'Novo Personagem 2'...
     if (!nomeTrim) {
       const nomePadrao = gerarProximoNomePadrao(fichas, fichaAberta.id);
-      const fichaComNome = { ...fichaAberta, nomePersonagem: nomePadrao };
-      setFichaAberta(fichaComNome);
-      const listaAtualizada = await salvarFichaLocal(fichaComNome);
-      setFichas(listaAtualizada);
-      return true;
+      fichaFinal = { ...fichaAberta, nomePersonagem: nomePadrao };
+    } else {
+      fichaFinal = { ...fichaAberta, nomePersonagem: nomeTrim };
     }
 
-    // Não permitir salvar personagem com nome já existente em outra ficha
-    if (existeFichaComMesmoNome(fichas, nomeTrim, fichaAberta.id)) {
-      Alert.alert(
-        'Nome Já Cadastrado',
-        `Já existe um personagem salvo com o nome "${nomeTrim}". Por favor, escolha um nome diferente.`
-      );
-      return false;
-    }
-
-    const fichaFinal = { ...fichaAberta, nomePersonagem: nomeTrim };
     setFichaAberta(fichaFinal);
     const listaAtualizada = await salvarFichaLocal(fichaFinal);
     setFichas(listaAtualizada);
@@ -247,7 +212,7 @@ export default function App() {
 
   const handleImportarFicha = async () => {
     try {
-      const resultado = await importarFichaArquivoJson(fichas);
+      const resultado = await importarFichaArquivoJson();
       if (!resultado) return;
       setFichas(resultado.lista);
       Alert.alert(
@@ -263,7 +228,7 @@ export default function App() {
       );
     } catch (e: any) {
       Alert.alert(
-        'Importação Não Permitida',
+        'Erro ao Importar Ficha',
         e?.message || 'O arquivo selecionado não é uma ficha válida do Tormenta RPG em formato JSON.'
       );
     }

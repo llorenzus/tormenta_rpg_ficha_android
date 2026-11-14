@@ -7,7 +7,6 @@ import { Platform, Share } from 'react-native';
 import {
   FichaPersonagem,
   criarPericiasPadrao,
-  existeFichaComMesmoNome,
   gerarId,
 } from '../models/ficha';
 import { gerarHtmlFichaPdf } from './fichaPdfGenerator';
@@ -309,9 +308,9 @@ export const exportarFichaArquivoJson = compartilharJson;
 
 /**
  * 6. IMPORTAR FICHA JSON
- * Lê o arquivo .json selecionado e valida se não há personagem existente com o mesmo nome.
+ * Lê o arquivo .json selecionado e importa a ficha para o armazenamento local.
  */
-export async function importarFichaArquivoJson(fichasExistentes: FichaPersonagem[] = []): Promise<{
+export async function importarFichaArquivoJson(): Promise<{
   lista: FichaPersonagem[];
   fichaImportada: FichaPersonagem;
 } | null> {
@@ -359,13 +358,6 @@ export async function importarFichaArquivoJson(fichasExistentes: FichaPersonagem
     typeof dadosFicha.nomePersonagem === 'string' && dadosFicha.nomePersonagem.trim()
       ? dadosFicha.nomePersonagem.trim()
       : 'Personagem Importado';
-
-  // Validação: não permitir importar personagem com nome já existente
-  if (existeFichaComMesmoNome(fichasExistentes, nomeCandidato)) {
-    throw new Error(
-      `Já existe uma ficha salva com o nome "${nomeCandidato}". Altere o nome na ficha existente ou no arquivo JSON antes de importar.`
-    );
-  }
 
   const fichaImportada: FichaPersonagem = normalizarFicha({
     ...dadosFicha,
