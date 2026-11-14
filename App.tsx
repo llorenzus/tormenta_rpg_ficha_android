@@ -8,6 +8,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { CompendioModal } from './src/components/CompendioModal';
+import {
+  converterMagiaParaItem,
+  converterTalentoParaItem,
+  MagiaData,
+  TalentoData,
+} from './src/data';
 import { criarNovaFichaPadrao, FichaPersonagem } from './src/models/ficha';
 import { FichaDetalheScreen } from './src/screens/FichaDetalheScreen';
 import { ListaFichasScreen } from './src/screens/ListaFichasScreen';
@@ -25,6 +32,7 @@ export default function App() {
   const [iniciado, setIniciado] = useState(false);
   const [fichas, setFichas] = useState<FichaPersonagem[]>([]);
   const [fichaAberta, setFichaAberta] = useState<FichaPersonagem | null>(null);
+  const [compendioGeralAberto, setCompendioGeralAberto] = useState(false);
 
   useEffect(() => {
     carregarFichasLocais().then(setFichas);
@@ -32,6 +40,10 @@ export default function App() {
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (compendioGeralAberto) {
+        setCompendioGeralAberto(false);
+        return true;
+      }
       if (fichaAberta) {
         setFichaAberta(null);
         return true;
@@ -43,7 +55,7 @@ export default function App() {
       return false;
     });
     return () => sub.remove();
-  }, [fichaAberta, iniciado]);
+  }, [compendioGeralAberto, fichaAberta, iniciado]);
 
   const handleCriarNova = async () => {
     const nova = criarNovaFichaPadrao();
@@ -107,6 +119,41 @@ export default function App() {
     }
   };
 
+  const handleAdicionarItemParaFichaEspecifica = async (
+    fichaId: string,
+    tipo: 'talento' | 'magia',
+    item: TalentoData | MagiaData
+  ) => {
+    const alvo = fichas.find((f) => f.id === fichaId);
+    if (!alvo) return;
+
+    let fichaModificada: FichaPersonagem;
+    if (tipo === 'talento') {
+      const novoTalento = converterTalentoParaItem(item as TalentoData);
+      fichaModificada = {
+        ...alvo,
+        talentos: [...alvo.talentos, novoTalento],
+      };
+    } else {
+      const novaMagia = converterMagiaParaItem(item as MagiaData);
+      fichaModificada = {
+        ...alvo,
+        magias: [...alvo.magias, novaMagia],
+      };
+    }
+
+    const listaAtualizada = await salvarFichaLocal(fichaModificada);
+    setFichas(listaAtualizada);
+    if (fichaAberta?.id === fichaId) {
+      setFichaAberta(fichaModificada);
+    }
+
+    Alert.alert(
+      'Adicionado com Sucesso!',
+      `"${item.nome}" foi registrado na ficha de "${alvo.nomePersonagem || 'Personagem'}".`
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
@@ -129,8 +176,17 @@ export default function App() {
             onExportarFicha={handleExportarFicha}
             onAbrirFicha={(f) => setFichaAberta(f)}
             onExcluirFicha={handleExcluirFicha}
+            onAbrirCompendio={() => setCompendioGeralAberto(true)}
           />
         )}
+
+        <CompendioModal
+          visivel={compendioGeralAberto}
+          onFechar={() => setCompendioGeralAberto(false)}
+          todasFichas={fichas}
+          fichaAtual={fichaAberta}
+          onAdicionarItemParaFichaEspecifica={handleAdicionarItemParaFichaEspecifica}
+        />
       </View>
     </SafeAreaView>
   );

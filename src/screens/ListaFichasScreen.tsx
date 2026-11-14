@@ -21,6 +21,7 @@ interface Props {
   onExportarFicha: (ficha: FichaPersonagem) => void;
   onAbrirFicha: (ficha: FichaPersonagem) => void;
   onExcluirFicha: (id: string) => void;
+  onAbrirCompendio: () => void;
 }
 
 export const ListaFichasScreen: React.FC<Props> = ({
@@ -30,6 +31,7 @@ export const ListaFichasScreen: React.FC<Props> = ({
   onExportarFicha,
   onAbrirFicha,
   onExcluirFicha,
+  onAbrirCompendio,
 }) => {
   const confirmarExclusao = (ficha: FichaPersonagem) => {
     const nome = ficha.nomePersonagem?.trim() || 'Sem Nome';
@@ -55,6 +57,12 @@ export const ListaFichasScreen: React.FC<Props> = ({
           <Text style={styles.topBarSubtitle}>Gerenciador de Fichas Locais</Text>
         </View>
         <View style={styles.topActionsRow}>
+          <TouchableOpacity
+            style={styles.btnTopCompendio}
+            onPress={onAbrirCompendio}
+          >
+            <Text style={styles.btnTopCompendioText}>📖 Compêndio</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.btnTopImportar}
             onPress={onImportarFicha}
@@ -82,6 +90,14 @@ export const ListaFichasScreen: React.FC<Props> = ({
               >
                 <Text style={styles.btnCriarGrandeText}>
                   + Criar Personagem
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnCompendioGrande}
+                onPress={onAbrirCompendio}
+              >
+                <Text style={styles.btnCompendioGrandeText}>
+                  📖 Consultar Compêndio de Regras
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -201,13 +217,26 @@ const styles = StyleSheet.create({
   topActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+  },
+  btnTopCompendio: {
+    backgroundColor: 'rgba(200,157,60,0.25)',
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  btnTopCompendioText: {
+    color: '#FFEAA7',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   btnTopImportar: {
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
     borderColor: COLORS.gold,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     borderRadius: 8,
   },
@@ -268,6 +297,20 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: 'bold',
     fontSize: 15,
+  },
+  btnCompendioGrande: {
+    backgroundColor: COLORS.surfaceVariant,
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  btnCompendioGrandeText: {
+    color: '#8A6414',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   btnImportarGrande: {
     backgroundColor: COLORS.surfaceVariant,
