@@ -7,12 +7,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { AbaDadosEAtributos } from '../components/AbaDadosEAtributos';
 import { AbaEquipamentos } from '../components/AbaEquipamentos';
 import { AbaHabilidadesEMagias } from '../components/AbaHabilidadesEMagias';
 import { AbaPericias } from '../components/AbaPericias';
+import { PainelLateralDesktop } from '../components/PainelLateralDesktop';
 import { calcularCaTotal, FichaPersonagem } from '../models/ficha';
 import { COLORS } from '../theme/colors';
 
@@ -39,6 +41,8 @@ export const FichaDetalheScreen: React.FC<Props> = ({
   onVoltar,
 }) => {
   const [abaAtiva, setAbaAtiva] = useState(0);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 850;
   const caTotal = calcularCaTotal(ficha);
 
   const handleSalvarClick = async () => {
@@ -47,6 +51,15 @@ export const FichaDetalheScreen: React.FC<Props> = ({
       Alert.alert('Ficha Salva', 'Todas as alterações foram salvas no seu aparelho.');
     }
   };
+
+  const subtituloDesktop = [
+    ficha.raca?.trim(),
+    ficha.classe?.trim(),
+    `Nível ${ficha.nivel}`,
+    ficha.jogador?.trim() && `Jogador: ${ficha.jogador.trim()}`,
+  ]
+    .filter(Boolean)
+    .join(' • ');
 
   return (
     <KeyboardAvoidingView
@@ -64,7 +77,9 @@ export const FichaDetalheScreen: React.FC<Props> = ({
             {ficha.nomePersonagem?.trim() || 'Ficha de Personagem'}
           </Text>
           <Text style={styles.subtitleText} numberOfLines={1}>
-            PV {ficha.pvAtual}/{ficha.pvTotal} • PM {ficha.pmAtual}/{ficha.pmTotal} • CA {caTotal}
+            {isDesktop
+              ? subtituloDesktop || 'Tormenta RPG'
+              : `PV ${ficha.pvAtual}/${ficha.pvTotal} • PM ${ficha.pmAtual}/${ficha.pmTotal} • CA ${caTotal}`}
           </Text>
         </View>
 
@@ -78,44 +93,55 @@ export const FichaDetalheScreen: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Abas na ordem solicitada */}
-      <View style={styles.tabBarWrap}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabBarScroll}
-        >
-          {ABAS.map((titulo, idx) => {
-            const selecionada = abaAtiva === idx;
-            return (
-              <TouchableOpacity
-                key={titulo}
-                style={[styles.tabItem, selecionada && styles.tabItemActive]}
-                onPress={() => setAbaAtiva(idx)}
-              >
-                <Text
-                  style={[styles.tabText, selecionada && styles.tabTextActive]}
-                >
-                  {titulo}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
+      {/* Corpo Dividido no Desktop / Vertical no Mobile */}
+      <View style={isDesktop ? styles.desktopBody : styles.mobileBody}>
+        {isDesktop && (
+          <View style={styles.desktopSidebar}>
+            <PainelLateralDesktop ficha={ficha} onChange={onChange} />
+          </View>
+        )}
 
-      {/* Conteúdo da Aba */}
-      <View style={styles.contentWrap}>
-        {abaAtiva === 0 && (
-          <AbaDadosEAtributos ficha={ficha} onChange={onChange} />
-        )}
-        {abaAtiva === 1 && <AbaPericias ficha={ficha} onChange={onChange} />}
-        {abaAtiva === 2 && (
-          <AbaHabilidadesEMagias ficha={ficha} onChange={onChange} />
-        )}
-        {abaAtiva === 3 && (
-          <AbaEquipamentos ficha={ficha} onChange={onChange} />
-        )}
+        <View style={isDesktop ? styles.desktopMain : styles.mobileMain}>
+          {/* Abas na ordem solicitada */}
+          <View style={styles.tabBarWrap}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.tabBarScroll}
+            >
+              {ABAS.map((titulo, idx) => {
+                const selecionada = abaAtiva === idx;
+                return (
+                  <TouchableOpacity
+                    key={titulo}
+                    style={[styles.tabItem, selecionada && styles.tabItemActive]}
+                    onPress={() => setAbaAtiva(idx)}
+                  >
+                    <Text
+                      style={[styles.tabText, selecionada && styles.tabTextActive]}
+                    >
+                      {titulo}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* Conteúdo da Aba */}
+          <View style={styles.contentWrap}>
+            {abaAtiva === 0 && (
+              <AbaDadosEAtributos ficha={ficha} onChange={onChange} />
+            )}
+            {abaAtiva === 1 && <AbaPericias ficha={ficha} onChange={onChange} />}
+            {abaAtiva === 2 && (
+              <AbaHabilidadesEMagias ficha={ficha} onChange={onChange} />
+            )}
+            {abaAtiva === 3 && (
+              <AbaEquipamentos ficha={ficha} onChange={onChange} />
+            )}
+          </View>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -128,12 +154,12 @@ const styles = StyleSheet.create({
   },
   topBar: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 6,
+    gap: 8,
   },
   backBtn: {
     paddingVertical: 6,
@@ -151,23 +177,23 @@ const styles = StyleSheet.create({
   titleText: {
     color: COLORS.white,
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 16,
   },
   subtitleText: {
     color: 'rgba(255,255,255,0.88)',
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 1,
   },
   topRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   exportBtn: {
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
     borderColor: COLORS.gold,
-    paddingHorizontal: 9,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
   },
@@ -178,7 +204,7 @@ const styles = StyleSheet.create({
   },
   saveBtn: {
     backgroundColor: COLORS.gold,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
   },
@@ -186,6 +212,26 @@ const styles = StyleSheet.create({
     color: '#1F1A17',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+  desktopBody: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  mobileBody: {
+    flex: 1,
+  },
+  desktopSidebar: {
+    width: 360,
+    borderRightWidth: 1.5,
+    borderRightColor: COLORS.border,
+    backgroundColor: '#F5EFE1',
+  },
+  desktopMain: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  mobileMain: {
+    flex: 1,
   },
   tabBarWrap: {
     backgroundColor: COLORS.surface,
@@ -196,7 +242,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   tabItem: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 3,
     borderBottomColor: 'transparent',
