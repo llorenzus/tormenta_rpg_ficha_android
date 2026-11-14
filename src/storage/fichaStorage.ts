@@ -113,11 +113,25 @@ export function gerarSlugNome(nome?: string): string {
 }
 
 /**
- * 1. SALVAR PDF LOCALMENTE NO APARELHO
- * Solicita ao usuário a pasta onde deseja salvar no Android (SAF) ou compartilha para salvar em arquivos.
+ * 1. SALVAR PDF LOCALMENTE NO APARELHO / DESKTOP
  */
 export async function salvarPdfNoAparelho(ficha: FichaPersonagem): Promise<boolean> {
   const html = gerarHtmlFichaPdf(ficha);
+
+  // No ambiente Web / Desktop Windows
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    const janela = window.open('', '_blank');
+    if (janela) {
+      janela.document.write(html);
+      janela.document.close();
+      janela.focus();
+      setTimeout(() => {
+        janela.print();
+      }, 400);
+      return true;
+    }
+  }
+
   const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
   const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}`;
 
@@ -134,7 +148,7 @@ export async function salvarPdfNoAparelho(ficha: FichaPersonagem): Promise<boole
   if (Platform.OS === 'android' && FileSystem.StorageAccessFramework) {
     const permissao = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
     if (!permissao.granted) {
-      return false; // Usuário cancelou a seleção da pasta
+      return false;
     }
 
     const safUri = await FileSystem.StorageAccessFramework.createFileAsync(
@@ -168,8 +182,7 @@ export async function salvarPdfNoAparelho(ficha: FichaPersonagem): Promise<boole
 }
 
 /**
- * 2. SALVAR JSON LOCALMENTE NO APARELHO
- * Solicita ao usuário a pasta onde deseja salvar no Android (SAF) ou compartilha para salvar em arquivos.
+ * 2. SALVAR JSON LOCALMENTE NO APARELHO / DESKTOP
  */
 export async function salvarJsonNoAparelho(ficha: FichaPersonagem): Promise<boolean> {
   const payload: EnvelopeExportacaoFicha = {
@@ -183,10 +196,24 @@ export async function salvarJsonNoAparelho(ficha: FichaPersonagem): Promise<bool
   const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
   const nomeArquivo = `ficha_tormenta_${slug}_${Date.now()}`;
 
+  // No ambiente Web / Desktop Windows: download direto do arquivo .json
+  if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    const blob = new Blob([conteudoJson], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${nomeArquivo}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return true;
+  }
+
   if (Platform.OS === 'android' && FileSystem.StorageAccessFramework) {
     const permissao = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
     if (!permissao.granted) {
-      return false; // Usuário cancelou
+      return false;
     }
 
     const safUri = await FileSystem.StorageAccessFramework.createFileAsync(
@@ -220,13 +247,16 @@ export async function salvarJsonNoAparelho(ficha: FichaPersonagem): Promise<bool
 
 /**
  * 3. COMPARTILHAR PDF
- * Gera o arquivo em cache temporário com identificador único (evita erro de file not found em chamadas seguidas)
- * e abre o menu nativo de compartilhamento do sistema.
  */
 export async function compartilharPdf(ficha: FichaPersonagem): Promise<void> {
   const html = gerarHtmlFichaPdf(ficha);
-  const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
 
+  if (Platform.OS === 'web') {
+    await salvarPdfNoAparelho(ficha);
+    return;
+  }
+
+  const slug = gerarSlugNome(ficha.nomePersonagem || 'personagem');
   const resultado = await Print.printToFileAsync({
     html,
     base64: true,
@@ -259,9 +289,13 @@ export async function compartilharPdf(ficha: FichaPersonagem): Promise<void> {
 
 /**
  * 4. COMPARTILHAR JSON
- * Gera o arquivo .json temporário com identificador único e abre o menu de compartilhamento.
  */
 export async function compartilharJson(ficha: FichaPersonagem): Promise<void> {
+  if (Platform.OS === 'web') {
+    await salvarJsonNoAparelho(ficha);
+    return;
+  }
+
   const payload: EnvelopeExportacaoFicha = {
     tipoArquivo: 'TORMENTA_RPG_FICHA',
     versaoApp: '1.1.0',
@@ -301,25 +335,97 @@ export async function compartilharJson(ficha: FichaPersonagem): Promise<void> {
 
 /**
  * 5. IMPRESSÃO DIRETA
- * Abre o spooler de impressão nativo do sistema operacional.
  */
 export async function imprimirFichaDireto(ficha: FichaPersonagem): Promise<void> {
   const html = gerarHtmlFichaPdf(ficha);
+
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    const janela = window.open('', '_blank');
+    if (janela) {
+      janela.document.write(html);
+      janela.document.close();
+      janela.focus();
+      setTimeout(() => {
+        janela.print();
+      }, 400);
+      return;
+    }
+  }
+
   await Print.printAsync({ html });
 }
 
-// Aliases para retrocompatibilidade
 export const exportarFichaArquivoPdf = compartilharPdf;
 export const exportarFichaArquivoJson = compartilharJson;
 
 /**
  * 6. IMPORTAR FICHA JSON
- * Lê o arquivo .json selecionado e importa a ficha para o armazenamento local.
  */
 export async function importarFichaArquivoJson(): Promise<{
   lista: FichaPersonagem[];
   fichaImportada: FichaPersonagem;
 } | null> {
+  // No ambiente Web / Desktop Windows: seletor de arquivo nativo do navegador/Electron
+  if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json,application/json';
+      input.style.display = 'none';
+      document.body.appendChild(input);
+
+      input.onchange = async (e: any) => {
+        const file = e.target.files?.[0];
+        document.body.removeChild(input);
+        if (!file) {
+          return resolve(null);
+        }
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const conteudo = reader.result as string;
+            const parsed = JSON.parse(conteudo);
+
+            let dadosFicha: any;
+            if (parsed.tipoArquivo === 'TORMENTA_RPG_FICHA' && parsed.ficha) {
+              dadosFicha = parsed.ficha;
+            } else if (parsed.nomePersonagem !== undefined || parsed.forca !== undefined) {
+              dadosFicha = parsed;
+            } else {
+              throw new Error('O arquivo JSON não corresponde à estrutura de uma ficha do Tormenta RPG.');
+            }
+
+            const nomeCandidato =
+              typeof dadosFicha.nomePersonagem === 'string' && dadosFicha.nomePersonagem.trim()
+                ? dadosFicha.nomePersonagem.trim()
+                : 'Personagem Importado';
+
+            const fichaImportada: FichaPersonagem = normalizarFicha({
+              ...dadosFicha,
+              id: gerarId(),
+              atualizadoEm: Date.now(),
+              nomePersonagem: nomeCandidato,
+            });
+
+            const lista = await salvarFichaLocal(fichaImportada);
+            resolve({ lista, fichaImportada });
+          } catch (err) {
+            reject(err);
+          }
+        };
+
+        reader.onerror = () => {
+          reject(new Error('Falha ao ler o arquivo selecionado.'));
+        };
+
+        reader.readAsText(file, 'UTF-8');
+      };
+
+      input.click();
+    });
+  }
+
   const resultado = await DocumentPicker.getDocumentAsync({
     type: ['application/json', 'text/json', '*/*'],
     copyToCacheDirectory: true,

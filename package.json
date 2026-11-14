@@ -1,14 +1,18 @@
 {
-  "name": "ficha-tormenta-rpg",
+  "name": "trpg-gerenciador-fichas",
   "version": "1.1.0",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "export:web": "expo export -p web",
+    "electron": "electron electron/main.js",
+    "build:windows": "expo export -p web && electron-builder --win --x64"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~58.0.17",
     "@react-native-async-storage/async-storage": "2.2.0",
     "babel-preset-expo": "~58.0.0",
     "expo": "~58.0.25",
@@ -18,12 +22,53 @@
     "expo-sharing": "~58.0.23",
     "expo-status-bar": "~58.0.5",
     "react": "19.3.0",
-    "react-native": "0.88.1"
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-web": "^0.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.3.0",
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0",
     "typescript": "~6.0.3"
+  },
+  "build": {
+    "appId": "com.tormenta.gerenciadorfichas",
+    "productName": "TRPG Gerenciador de Fichas",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${target}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "private": true
 }

@@ -1,0 +1,78 @@
+name: Compilar Aplicativo (Android e Windows)
+
+on:
+  push:
+    branches: [ main, aplicacao-windows, 'feat/**' ]
+  workflow_dispatch:
+
+jobs:
+  # ========================================================
+  # JOB 1: Compilação do APK Android
+  # ========================================================
+  build-android:
+    name: Gerar APK Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Configurar Java JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Gerar projeto nativo Android (Expo Prebuild)
+        run: npx expo prebuild --platform android --clean
+
+      - name: Compilar APK de Release
+        working-directory: ./android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Renomear arquivo APK
+        run: mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/TRPG-Ficha-Android.apk
+
+      - name: Publicar APK nos Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: TRPG-Ficha-Android
+          path: android/app/build/outputs/apk/release/TRPG-Ficha-Android.apk
+
+  # ========================================================
+  # JOB 2: Compilação do Executável Windows Desktop (.exe)
+  # ========================================================
+  build-windows:
+    name: Gerar Executável Windows Desktop
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Compilar Web e Empacotar Executável Windows (Electron)
+        run: npm run build:windows
+
+      - name: Publicar Executáveis Windows nos Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: TRPG-Ficha-Windows
+          path: dist-electron/*.exe

@@ -1,6 +1,7 @@
 node_modules/
 .expo/
 dist/
+dist-electron/
 web-build/
 *.jks
 *.p8
