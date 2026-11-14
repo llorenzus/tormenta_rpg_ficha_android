@@ -76,3 +76,4 @@ jobs:
         with:
           name: TRPG-Ficha-Windows
           path: dist-electron/*.exe
+

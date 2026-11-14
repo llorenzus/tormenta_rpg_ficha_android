@@ -2,3 +2,4 @@
 window.addEventListener('DOMContentLoaded', () => {
   // Inicialização básica caso necessário
 });
+
