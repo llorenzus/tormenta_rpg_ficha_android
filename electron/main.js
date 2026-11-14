@@ -1,13 +1,31 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, protocol, net } = require('electron');
 const path = require('path');
+const url = require('url');
+
+// Registra o esquema 'app' como privilegiado antes do evento ready
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'app',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      allowServiceWorkers: true,
+      corsEnabled: true,
+    },
+  },
+]);
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '../assets/icon.png');
+
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 820,
     minWidth: 900,
     minHeight: 600,
     title: 'TRPG - Gerenciador de Fichas',
+    icon: iconPath,
     autoHideMenuBar: true,
     backgroundColor: '#FAF6EE',
     webPreferences: {
@@ -16,16 +34,16 @@ function createWindow() {
     },
   });
 
-  // Em produção, carrega os arquivos estáticos gerados pelo Expo Web (dist/)
-  // Em desenvolvimento, caso passe a env var LOAD_URL, carrega da porta do Metro
-  const startUrl = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, '../dist/index.html')}`;
-
-  mainWindow.loadURL(startUrl);
+  if (process.env.ELECTRON_START_URL) {
+    mainWindow.loadURL(process.env.ELECTRON_START_URL);
+  } else {
+    mainWindow.loadURL('app://bundle/index.html');
+  }
 
   // Abre links externos no navegador padrão do usuário
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('http:') || url.startsWith('https:')) {
-      shell.openExternal(url);
+  mainWindow.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    if (targetUrl.startsWith('http:') || targetUrl.startsWith('https:')) {
+      shell.openExternal(targetUrl);
       return { action: 'deny' };
     }
     return { action: 'allow' };
@@ -33,6 +51,20 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Protocolo app:// mapeia para a pasta dist/
+  protocol.handle('app', (request) => {
+    const parsedUrl = new URL(request.url);
+    let pathname = decodeURIComponent(parsedUrl.pathname);
+    if (!pathname || pathname === '/') {
+      pathname = '/index.html';
+    }
+
+    const distPath = path.join(__dirname, '../dist');
+    const resolvedPath = path.join(distPath, pathname);
+
+    return net.fetch(url.pathToFileURL(resolvedPath).toString());
+  });
+
   createWindow();
 
   app.on('activate', () => {
@@ -47,4 +79,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
