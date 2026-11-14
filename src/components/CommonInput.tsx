@@ -43,6 +43,7 @@ interface CampoTextoProps {
   onChangeText: (text: string) => void;
   placeholder?: string;
   multiline?: boolean;
+  keyboardType?: 'default' | 'numeric' | 'number-pad' | 'decimal-pad' | 'email-address' | 'phone-pad';
   style?: ViewStyle;
 }
 
@@ -52,6 +53,7 @@ export const CampoTexto: React.FC<CampoTextoProps> = ({
   onChangeText,
   placeholder,
   multiline = false,
+  keyboardType,
   style,
 }) => {
   return (
@@ -64,6 +66,7 @@ export const CampoTexto: React.FC<CampoTextoProps> = ({
         placeholder={placeholder}
         placeholderTextColor="#9D8E80"
         multiline={multiline}
+        keyboardType={keyboardType}
       />
     </View>
   );

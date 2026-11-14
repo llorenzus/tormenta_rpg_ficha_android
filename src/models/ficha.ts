@@ -205,6 +205,23 @@ export function calcularTotalPericia(ficha: FichaPersonagem, pericia: PericiaIte
   return grad + mod + outros;
 }
 
+export function calcularResistencia(
+  ficha: FichaPersonagem,
+  tipo: 'fortitude' | 'reflexos' | 'vontade'
+): number {
+  const meioNivel = Math.floor((ficha.nivel || 1) / 2);
+  if (tipo === 'fortitude') {
+    const modCon = obterModAtributo(ficha, 'CON');
+    return meioNivel + modCon + (Number(ficha.fortitudeOutros) || 0);
+  }
+  if (tipo === 'reflexos') {
+    const modDes = obterModAtributo(ficha, 'DES');
+    return meioNivel + modDes + (Number(ficha.reflexosOutros) || 0);
+  }
+  const modSab = obterModAtributo(ficha, 'SAB');
+  return meioNivel + modSab + (Number(ficha.vontadeOutros) || 0);
+}
+
 export function criarPericiasPadrao(): PericiaItem[] {
   const base: Array<{ nome: string; atributoChave: AtributoSigla; somenteTreinada?: boolean }> = [
     { nome: 'Acrobacia', atributoChave: 'DES' },

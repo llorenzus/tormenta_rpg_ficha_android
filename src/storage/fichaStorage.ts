@@ -1,18 +1,24 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Share } from 'react-native';
 import {
-  calcularCaTotal,
-  criarPericiasPadrao,
   FichaPersonagem,
+  criarPericiasPadrao,
   gerarId,
 } from '../models/ficha';
+import { gerarHtmlFichaPdf } from './fichaPdfGenerator';
 
 const STORAGE_KEY = '@tormenta_rpg:fichas_v1';
-const MARCADOR_INICIO = '===TORMENTA_FICHA_INICIO===';
-const MARCADOR_FIM = '===TORMENTA_FICHA_FIM===';
+
+export interface EnvelopeExportacaoFicha {
+  tipoArquivo: 'TORMENTA_RPG_FICHA';
+  versaoApp: string;
+  exportadoEm: string;
+  ficha: FichaPersonagem;
+}
 
 export function normalizarFicha(ficha: FichaPersonagem): FichaPersonagem {
   return {
@@ -90,90 +96,44 @@ export async function excluirFichaLocal(fichaId: string): Promise<FichaPersonage
   return filtrada;
 }
 
-export function serializarFichaParaTxt(ficha: FichaPersonagem): string {
-  const ca = calcularCaTotal(ficha);
-  const nome = ficha.nomePersonagem?.trim() || 'Sem Nome';
-  const raca = ficha.raca?.trim() || '-';
-  const classe = ficha.classe?.trim() || '-';
-
-  const linhasResumo = [
-    '==========================================',
-    `FICHA TORMENTA RPG: ${nome}`,
-    '==========================================',
-    `Raça: ${raca} | Classe: ${classe} | Nível: ${ficha.nivel}`,
-    `PV: ${ficha.pvAtual}/${ficha.pvTotal} | PM: ${ficha.pmAtual}/${ficha.pmTotal} | CA: ${ca} | BBA: +${ficha.bba}`,
-    `FOR: ${ficha.forca} | DES: ${ficha.destreza} | CON: ${ficha.constituicao} | INT: ${ficha.inteligencia} | SAB: ${ficha.sabedoria} | CAR: ${ficha.carisma}`,
-    '',
-    'Para importar esta ficha no aplicativo Tormenta RPG,',
-    'basta selecionar este arquivo .txt na opção "Importar Ficha".',
-    '',
-    MARCADOR_INICIO,
-    JSON.stringify(ficha, null, 2),
-    MARCADOR_FIM,
-    '',
-  ];
-
-  return linhasResumo.join('\n');
-}
-
-export function extrairFichaDeTxt(conteudo: string): FichaPersonagem {
-  const texto = conteudo.trim();
-  let jsonStr = texto;
-
-  const idxInicio = texto.indexOf(MARCADOR_INICIO);
-  const idxFim = texto.indexOf(MARCADOR_FIM);
-
-  if (idxInicio !== -1 && idxFim !== -1 && idxFim > idxInicio) {
-    jsonStr = texto.substring(idxInicio + MARCADOR_INICIO.length, idxFim).trim();
-  } else {
-    const primeiroBrace = texto.indexOf('{');
-    const ultimoBrace = texto.lastIndexOf('}');
-    if (primeiroBrace !== -1 && ultimoBrace > primeiroBrace) {
-      jsonStr = texto.substring(primeiroBrace, ultimoBrace + 1);
-    }
-  }
-
-  const parsed = JSON.parse(jsonStr);
-  if (!parsed || typeof parsed !== 'object') {
-    throw new Error('Formato de arquivo inválido.');
-  }
-
-  const novaFicha: FichaPersonagem = normalizarFicha({
-    ...parsed,
-    id: gerarId(),
-    atualizadoEm: Date.now(),
-    nomePersonagem:
-      typeof parsed.nomePersonagem === 'string' && parsed.nomePersonagem.trim()
-        ? parsed.nomePersonagem.trim()
-        : 'Personagem Importado',
-  });
-
-  return novaFicha;
-}
-
-export async function exportarFichaArquivoTxt(ficha: FichaPersonagem): Promise<void> {
-  const conteudoTxt = serializarFichaParaTxt(ficha);
-  const slugNome = (ficha.nomePersonagem || 'personagem')
+export function gerarSlugNome(nome?: string): string {
+  return (nome || 'personagem')
     .trim()
     .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9_-]+/gi, '_')
     .replace(/^_+|_+$/g, '') || 'personagem';
+}
 
-  const nomeArquivo = `ficha_tormenta_${slugNome}.txt`;
+/**
+ * Exporta a ficha em formato JSON estruturado para importação em outro dispositivo.
+ */
+export async function exportarFichaArquivoJson(ficha: FichaPersonagem): Promise<void> {
+  const payload: EnvelopeExportacaoFicha = {
+    tipoArquivo: 'TORMENTA_RPG_FICHA',
+    versaoApp: '1.1.0',
+    exportadoEm: new Date().toISOString(),
+    ficha: normalizarFicha(ficha),
+  };
+
+  const conteudoJson = JSON.stringify(payload, null, 2);
+  const slug = gerarSlugNome(ficha.nomePersonagem);
+  const nomeArquivo = `ficha_tormenta_${slug}.json`;
   const diretorio = FileSystem.cacheDirectory || FileSystem.documentDirectory;
 
   if (diretorio) {
     const fileUri = `${diretorio}${nomeArquivo}`;
-    await FileSystem.writeAsStringAsync(fileUri, conteudoTxt, {
+    await FileSystem.writeAsStringAsync(fileUri, conteudoJson, {
       encoding: FileSystem.EncodingType.UTF8,
     });
 
     const podeCompartilhar = await Sharing.isAvailableAsync();
     if (podeCompartilhar) {
       await Sharing.shareAsync(fileUri, {
-        mimeType: 'text/plain',
-        dialogTitle: `Exportar Ficha - ${ficha.nomePersonagem || 'Personagem'}`,
-        UTI: 'public.plain-text',
+        mimeType: 'application/json',
+        dialogTitle: `Exportar Ficha (JSON) - ${ficha.nomePersonagem || 'Personagem'}`,
+        UTI: 'public.json',
       });
       return;
     }
@@ -181,16 +141,57 @@ export async function exportarFichaArquivoTxt(ficha: FichaPersonagem): Promise<v
 
   await Share.share({
     title: `Ficha Tormenta RPG - ${ficha.nomePersonagem || 'Personagem'}`,
-    message: conteudoTxt,
+    message: conteudoJson,
   });
 }
 
-export async function importarFichaArquivoTxt(): Promise<{
+/**
+ * Exporta a ficha formatada em PDF profissional para impressão ou visualização.
+ */
+export async function exportarFichaArquivoPdf(ficha: FichaPersonagem): Promise<void> {
+  const html = gerarHtmlFichaPdf(ficha);
+  const slug = gerarSlugNome(ficha.nomePersonagem);
+
+  // Gera o PDF a partir do HTML estilizado
+  const { uri } = await Print.printToFileAsync({
+    html,
+    base64: false,
+  });
+
+  // Copia/move para um nome de arquivo amigável caso haja diretório de cache
+  let uriFinal = uri;
+  const diretorio = FileSystem.cacheDirectory || FileSystem.documentDirectory;
+  if (diretorio) {
+    const destinoUri = `${diretorio}ficha_tormenta_${slug}.pdf`;
+    try {
+      await FileSystem.copyAsync({ from: uri, to: destinoUri });
+      uriFinal = destinoUri;
+    } catch {
+      uriFinal = uri;
+    }
+  }
+
+  const podeCompartilhar = await Sharing.isAvailableAsync();
+  if (podeCompartilhar) {
+    await Sharing.shareAsync(uriFinal, {
+      mimeType: 'application/pdf',
+      dialogTitle: `Exportar Ficha (PDF) - ${ficha.nomePersonagem || 'Personagem'}`,
+      UTI: 'com.adobe.pdf',
+    });
+  } else {
+    throw new Error('O compartilhamento de arquivos não está disponível neste dispositivo.');
+  }
+}
+
+/**
+ * Importa uma ficha a partir de um arquivo .json selecionado pelo usuário.
+ */
+export async function importarFichaArquivoJson(): Promise<{
   lista: FichaPersonagem[];
   fichaImportada: FichaPersonagem;
 } | null> {
   const resultado = await DocumentPicker.getDocumentAsync({
-    type: ['text/plain', 'application/json', '*/*'],
+    type: ['application/json', 'text/json', '*/*'],
     copyToCacheDirectory: true,
     multiple: false,
   });
@@ -200,11 +201,47 @@ export async function importarFichaArquivoTxt(): Promise<{
   }
 
   const arquivo = resultado.assets[0];
+
+  // Validação por extensão se o picker do Android retornar tipo genérico
+  if (arquivo.name && !arquivo.name.toLowerCase().endsWith('.json')) {
+    throw new Error('Apenas arquivos no formato .json são aceitos para importação de ficha.');
+  }
+
   const conteudo = await FileSystem.readAsStringAsync(arquivo.uri, {
     encoding: FileSystem.EncodingType.UTF8,
   });
 
-  const fichaImportada = extrairFichaDeTxt(conteudo);
+  let parsed: any;
+  try {
+    parsed = JSON.parse(conteudo);
+  } catch {
+    throw new Error('O arquivo selecionado não contém um JSON válido.');
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('Formato do arquivo de ficha inválido.');
+  }
+
+  // Suporte a envelope { tipoArquivo: 'TORMENTA_RPG_FICHA', ficha: {...} } ou ficha direta
+  let dadosFicha: any;
+  if (parsed.tipoArquivo === 'TORMENTA_RPG_FICHA' && parsed.ficha) {
+    dadosFicha = parsed.ficha;
+  } else if (parsed.nomePersonagem !== undefined || parsed.forca !== undefined) {
+    dadosFicha = parsed;
+  } else {
+    throw new Error('O arquivo JSON não corresponde à estrutura de uma ficha do Tormenta RPG.');
+  }
+
+  const fichaImportada: FichaPersonagem = normalizarFicha({
+    ...dadosFicha,
+    id: gerarId(),
+    atualizadoEm: Date.now(),
+    nomePersonagem:
+      typeof dadosFicha.nomePersonagem === 'string' && dadosFicha.nomePersonagem.trim()
+        ? dadosFicha.nomePersonagem.trim()
+        : 'Personagem Importado',
+  });
+
   const lista = await salvarFichaLocal(fichaImportada);
   return { lista, fichaImportada };
 }

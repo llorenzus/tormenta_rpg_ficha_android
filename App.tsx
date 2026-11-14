@@ -22,8 +22,9 @@ import { TelaInicialScreen } from './src/screens/TelaInicialScreen';
 import {
   carregarFichasLocais,
   excluirFichaLocal,
-  exportarFichaArquivoTxt,
-  importarFichaArquivoTxt,
+  exportarFichaArquivoJson,
+  exportarFichaArquivoPdf,
+  importarFichaArquivoJson,
   salvarFichaLocal,
 } from './src/storage/fichaStorage';
 import { COLORS } from './src/theme/colors';
@@ -84,20 +85,46 @@ export default function App() {
     }
   };
 
-  const handleExportarFicha = async (ficha: FichaPersonagem) => {
-    try {
-      await exportarFichaArquivoTxt(ficha);
-    } catch (e: any) {
-      Alert.alert(
-        'Erro ao Exportar',
-        e?.message || 'Não foi possível exportar o arquivo da ficha.'
-      );
-    }
+  const handleExportarFicha = (ficha: FichaPersonagem) => {
+    const nome = ficha.nomePersonagem?.trim() || 'Personagem';
+    Alert.alert(
+      `Exportar: ${nome}`,
+      'Escolha como deseja exportar esta ficha:',
+      [
+        {
+          text: '📄 Gerar PDF (Imprimir)',
+          onPress: async () => {
+            try {
+              await exportarFichaArquivoPdf(ficha);
+            } catch (e: any) {
+              Alert.alert(
+                'Erro ao Exportar PDF',
+                e?.message || 'Não foi possível gerar o PDF da ficha.'
+              );
+            }
+          },
+        },
+        {
+          text: '💾 Salvar JSON (Compartilhar)',
+          onPress: async () => {
+            try {
+              await exportarFichaArquivoJson(ficha);
+            } catch (e: any) {
+              Alert.alert(
+                'Erro ao Exportar JSON',
+                e?.message || 'Não foi possível exportar a ficha em JSON.'
+              );
+            }
+          },
+        },
+        { text: 'Cancelar', style: 'cancel' },
+      ]
+    );
   };
 
   const handleImportarFicha = async () => {
     try {
-      const resultado = await importarFichaArquivoTxt();
+      const resultado = await importarFichaArquivoJson();
       if (!resultado) return;
       setFichas(resultado.lista);
       Alert.alert(
@@ -113,8 +140,8 @@ export default function App() {
       );
     } catch (e: any) {
       Alert.alert(
-        'Erro ao Importar',
-        'O arquivo selecionado não é uma ficha válida do Tormenta RPG.'
+        'Erro ao Importar Ficha',
+        e?.message || 'O arquivo selecionado não é uma ficha válida do Tormenta RPG em formato JSON.'
       );
     }
   };

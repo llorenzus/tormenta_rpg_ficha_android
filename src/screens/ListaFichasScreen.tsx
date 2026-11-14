@@ -81,7 +81,7 @@ export const ListaFichasScreen: React.FC<Props> = ({
             <Text style={styles.emptyTitle}>Nenhuma ficha salva ainda</Text>
             <Text style={styles.emptyDesc}>
               Toque em "+ Criar Personagem" para criar sua ficha de Tormenta RPG
-              ou importe um arquivo .txt enviado por um amigo.
+              ou importe um arquivo .json enviado por um amigo.
             </Text>
             <View style={styles.emptyActionsCol}>
               <TouchableOpacity
